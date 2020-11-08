@@ -72,7 +72,7 @@ class Game(arcade.View):
                 self.game_state = "GameOn"
         
         elif self.game_state == "GameOn":
-            box = (x//G_SIZE, y//G_SIZE)    #Location of box
+            box = (x//G_SIZE, y//G_SIZE)    #Location of box(x,y)
             if(self.is_Legal_Move(box)):
                 self.update_grid(box)       
                 self.evaluateBoard()
@@ -86,22 +86,112 @@ class Game(arcade.View):
                     self.turn = 1000
             
     def is_Legal_Move(self,box):
-        #Clicking on grid line (Not Checking right now)
+        #Clicking on grid line (Not Checking and not needed)
         #Clicking on an area out of bounds(outside the GridWorld) (Checking)
         #Moving the Snail onto opponent’s Snail or Trail of Slime (Checking)
-        #Playing a move by passing an empty Grid Square (Not Checking right now)
+        #Playing a move by passing an empty Grid Square (Checking)
+        x = box[0]
+        y = box[1]
+        if x <= SCREEN_WIDTH and y <= SCREEN_HEIGHT: #Checking if clicked out side screen
+            
+            #The following long if is checking moving on the opponent's slime
+            if (self.turn == 1000 and (board[x][y] == 0 or board[x][y] == 10)) or ((self.turn == 2000) and (board[x][y] == 0 or board[x][y] == 20)): 
+               
+                #--------Checking Snail is not bypassing a square Start--------------#
+                try: # Using these try and except blocks to ignore index error 
+                    left = board[x-1][y]
+                except:
+                    pass
+                try:
+                    right = board[x+1][y]
+                except:
+                    pass
+                try:
+                    top = board[x][y+1]
+                except:
+                    pass
+                try:
+                    bottom = board[box[0]][box[1]-1]
+                except:
+                    pass
+                if self.turn == 1000:
+                    if x == 0 and y == 9:
+                        if (right == 1 or bottom == 1):
+                            return True
+                        return False
+                    elif x == 9 and y == 0:
+                        if (top == 1 or left == 1):
+                            return True
+                        return False
+                    elif x == 9 and y == 9:
+                        if (bottom == 1 or left == 1) :
+                            return True
+                        return False   
+                    elif x == 9 or x == 0 or y == 0 or y == 9:
+                        if x == 0:
+                            if (top == 1 or bottom == 1 or right == 1):
+                                return True
+                            return False
+                        elif x == 9:
+                            if (top == 1 or bottom == 1 or left == 1):
+                                return True
+                            return False
+                        elif y == 0:
+                            if (left == 1 or top == 1 or right == 1):
+                                return True
+                            return False
+                        elif y == 9:
+                            if (left == 1 or bottom == 1 or right == 1):
+                                return True
+                            return False
+                        else:
+                            return False
+                    elif (x > 0 or x < 9) and (y > 0 or y < 9):
+                        if (left == 1 or right == 1 or top == 1 or bottom == 1 ):
+                            return True
+                        return False
+                
+                elif self.turn == 2000:
+                    if x == 0 and y == 9:
+                        if  (right == 2 or bottom == 2):
+                            return True
+                        return False
+                    elif x == 9 and y == 0:
+                        if (top == 2 or left == 2):
+                            return True
+                        return False
+                    elif x == 9 and y == 9:
+                        if (bottom == 2 or left == 2):
+                            return True
+                        return False   
+                    elif x == 9 or x == 0 or y == 0 or y == 9:
+                        if x == 0:
+                            if (top == 2 or bottom == 2 or right == 2 ):
+                                return True
+                            return False
+                        elif x == 9:
+                            if (top == 2 or bottom == 2 or left == 2 ):
+                                return True
+                            return False
+                        elif y == 0:
+                            if (left == 2 or top == 2 or right == 2):
+                                return True
+                            return False
+                        elif y == 9:
+                            if (left == 2 or bottom == 2 or right == 2):
+                                return True
+                            return False
+                        else:
+                            return False
+                    elif (x > 0 or x < 9) and (y > 0 or y < 9):
+                        if  (left == 2 or right == 2 or top == 2 or bottom == 2 ):
+                            return True
+                        return False
+                    #--------Checking Snail is not bypassing a square End--------------#
+            else:
+                return False
 
-        if box[0] <= SCREEN_WIDTH and box[1] <= SCREEN_HEIGHT: #Checking if clicked out side screen
-            if self.turn == 1000:
-                if board[box[0]][box[1]] == 0 or board[box[0]][box[1]] == 10:
-                    return True
-                else:
-                    return False
-            elif self.turn == 2000:
-                if board[box[0]][box[1]] == 0 or board[box[0]][box[1]] == 20:
-                    return True
-                else:
-                    return False
+
         else:
             return False
 
