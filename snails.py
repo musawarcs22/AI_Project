@@ -32,8 +32,10 @@ class Game(arcade.View):
         self.turn = 1000 #(Human Turn) if Turn = 2000 (Bot Turn) 
         self.human_score = 0 #counter
         self.bot_score= 0 # counter
-        self.human_Location = (0,0) # Initial Position of Human Snail is (0,0)
-        self.Bot_Location = (9,9) # Initial Position of Bot is (9,9)
+
+        self.human_Location = [0,0] # Initial Position of Human Snail is (0,0)
+        self.Bot_Location = [9,9] # Initial Position of Bot is (9,9)
+        
     
     def initailizeBoard(self):
         #The function is making the back-end 2D matrix
@@ -72,7 +74,7 @@ class Game(arcade.View):
                 self.game_state = "GameOn"
         
         elif self.game_state == "GameOn":
-            box = (x//G_SIZE, y//G_SIZE)    #Location of box(x,y)
+            box = [x//G_SIZE, y//G_SIZE]    #Location of box(x,y)
             if(self.is_Legal_Move(box)):
                 self.update_grid(box)       
                 self.evaluateBoard()
@@ -196,9 +198,12 @@ class Game(arcade.View):
             return False
 
     def update_grid(self,box):
+        
         """
         This function is updating backend 2d matrix and player scores.
-        box(x,y) is the location where Snail needs to be placed. 
+        box[x,y] is the location where Snail needs to be placed. 
+        """
+
         """
        # print("\n\n\n---box = {0}".format(box))
         if self.turn == 1000:
@@ -207,13 +212,155 @@ class Game(arcade.View):
             self.turn = 2000
             self.human_Location = box
             self.human_score += 1        #Increasing Human Score
-        elif self.turn == 2000:
+        if self.turn == 2000:
             board[self.Bot_Location[0]][self.Bot_Location[1]] = 20
             board[box[0]][box[1]] = 2    
             self.turn = 1000
             self.Bot_Location = box     
             self.bot_score += 1         #Increasing Bot Score
-        print("------------------------------------")
+        """
+        #for i in range(5,0,-1):
+         #   print(i)
+        
+        
+        
+        # print("\n\n\n---box = {0}".format(box))
+        #Present Location of Bot 
+        bx = self.Bot_Location[0] 
+        by = self.Bot_Location[1]
+        #Present Location of Human 
+        hx = self.human_Location[0]
+        hy = self.human_Location[1]
+        #Desired Location where the mouse is clicked 
+        cx = box[0]
+        cy = box[1]
+        #----------------------------------------------------
+        if self.turn == 1000:     #-------> HUMAN's TURN <------------
+            board[hx][hy] = 10    #Placing Splash on the Present human Location 
+            self.turn = 2000      #Changing Turn
+            self.human_score += 1 #Increasing Human Score     
+            if board[cx][cy] == 10: #This will execute when the Human clicks on his Splash(Slippery Functionality for Human)
+                if hx == cx and cy > hy:
+                    for y in range(hy+1, 10, 1):
+                        if y == 9 and board[cx][y]==10:
+                            board[cx][y] = 1
+                            self.human_Location[0] = cx
+                            self.human_Location[1] = y
+                            break
+                        elif board[cx][y] == 0 or board[cx][y] == 20 or board[cx][y] == 2:
+                            board[cx][y-1] = 1
+                            self.human_Location[0] = cx
+                            self.human_Location[1] = y-1
+                            break
+                elif hx == cx and cy < hy:
+                    for y in range(hy-1, -1, -1):
+                        if y == 0 and board[cx][y] == 10:
+                            board[cx][y] = 1
+                            self.human_Location[0] = cx
+                            self.human_Location[1] = y
+                            break
+                        elif board[cx][y] == 0 or board[cx][y] == 20 or board[cx][y] == 2:
+                            board[cx][y+1] = 1
+                            self.human_Location[0] = cx
+                            self.human_Location[1] = y+1
+                            break
+                elif cx > hx and cy == hy:
+                    for x in range(cx+1, 10, 1):
+                        if x == 9:
+                            board[x][cy] = 1
+                            self.human_Location[0] = x
+                            self.human_Location[1] = cy
+                            break
+                        elif board[x][cy] == 0 or board[x][cy] == 20 or board[x][cy] == 2:
+                            board[x-1][cy] = 1
+                            self.human_Location[0] = x-1
+                            self.human_Location[1] = cy
+                            break
+                elif cx < hx and cy == hy:
+                    for x in range(cx-1, -1, -1):
+                        if x == 0:
+                            board[x][cy] = 1
+                            self.human_Location[0] = x
+                            self.human_Location[1] = cy
+                            break
+                        elif board[x][cy] == 0 or board[x][cy] == 20 or board[x][cy] == 2:
+                            board[x+1][cy] = 1
+                            self.human_Location[0] = x+1
+                            self.human_Location[1] = cy
+                            break
+                elif cx == hx and cy == hy: #When Player will click on itself it will lose the turn and scores will remain the same
+                    self.human_score -= 1 
+                #----------------------------------------------------------------------------
+                
+            else:                   #This will execute When Human clicks Empty Square
+                board[hx][hy] = 10
+                board[cx][cy] = 1
+                self.human_Location = box
+                #----------------------------------------------------------------------------
+                #----------------------------------------------------------------------------
+        elif self.turn == 2000:      #-----> BOT's TURN <-----
+            board[bx][by] = 20       #Putting Splash on the Bot Location
+            self.turn = 1000         #Fliping turn       
+            self.bot_score += 1      #Increasing Bot Score 
+            if board[cx][cy] == 20:  #This will execute when the Bot clicks on his Splash(Slippery Functionality for Bot)   
+                if bx == cx and cy > by:
+                    for y in range(by+1, 10, 1):
+                        if y == 9 and board[cx][y] == 20:
+                            board[cx][y] = 2
+                            self.Bot_Location[0] = cx
+                            self.Bot_Location[1] = y
+                            break
+                        elif board[cx][y] == 0 or board[cx][y] == 10 or board[cx][y] == 1:
+                            board[cx][y-1] = 2
+                            self.Bot_Location[0] = cx
+                            self.Bot_Location[1] = y-1
+                            break
+                elif bx == cx and cy <  by:
+                    for y in range(by-1, -1, -1):
+                        if y == 0 and board[cx][y] == 20:
+                            board[cx][y] = 2
+                            self.Bot_Location[0] = cx
+                            self.Bot_Location[1] = y
+                            break
+                        elif board[cx][y] == 0 or board[cx][y] == 10 or board[cx][y] == 1:
+                            board[cx][y+1] = 2
+                            self.Bot_Location[0] = cx
+                            self.Bot_Location[1] = y+1
+                            break
+                elif cx > bx and cy == by:
+                    for x in range(cx+1, 10, 1):
+                        if x == 9:
+                            board[x][cy] = 2
+                            self.Bot_Location[0] = x
+                            self.Bot_Location[1] = cy
+                            break
+                        elif board[x][cy] == 0 or board[x][cy] == 10 or board[x][cy] == 1:
+                            board[x-1][cy] = 2
+                            self.Bot_Location[0] = x-1
+                            self.Bot_Location[1] = cy
+                            break
+                elif cx < bx and cy == by:
+                    for x in range(cx-1, -1, -1):
+                        if x == 0:
+                            board[x][cy] = 2
+                            self.Bot_Location[0] = x
+                            self.Bot_Location[1] = cy
+                            break
+                        elif board[x][cy] == 0 or board[x][cy] == 10 or board[x][cy] == 1:
+                            board[x+1][cy] = 2
+                            self.Bot_Location[0] = x+1
+                            self.Bot_Location[1] = cy
+                            break
+                elif cx == bx and cy == by:
+                    self.bot_score -= 1 
+                #---------------------------------------------   
+            else:    #This will execute When Bot clicks Empty Square
+                board[bx][by] = 20
+                board[cx][cy] = 2
+                self.Bot_Location = box
+                #---------------------------------------------
+
+        print("-----------------------------------------------")
         print(board)
         
     def on_show(self):
@@ -262,12 +409,11 @@ class Game(arcade.View):
         elif self.game_state == "BotWon":
             pass
 
-
 def main():
 
     window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT,SCREEN_TITLE)
     game_view = Game()
     window.show_view(game_view)
     arcade.run()
-
+    
 main()
