@@ -251,6 +251,7 @@ class Game(arcade.View):
             self.human_score += 1 #Increasing Human Score     
             self.turn = 2000      #Changing Turn
             if board[cx][cy] == 10: #This will execute when the Human clicks on his Splash(Slippery Functionality for Human)
+                
                 if hx == cx and cy > hy:
                     for y in range(hy+1, 10, 1):
                         if y == 9 and board[cx][y]==10:
@@ -276,9 +277,12 @@ class Game(arcade.View):
                             self.human_Location[1] = y+1
                             break
                 elif cx > hx and cy == hy:
+                    if cx == 9:              #Right Side Corner case
+                        board[cx][cy] = 1
+                        self.human_Location = box
+                        return
                     for x in range(cx+1, 10, 1):
                         if x == 9:
-                            board[x][cy] = 1
                             self.human_Location[0] = x
                             self.human_Location[1] = cy
                             break
@@ -288,6 +292,10 @@ class Game(arcade.View):
                             self.human_Location[1] = cy
                             break
                 elif cx < hx and cy == hy:
+                    if cx == 0:             #Left Side Corner case
+                        board[cx][cy] = 1
+                        self.human_Location = box
+                        return
                     for x in range(cx-1, -1, -1):
                         if x == 0:
                             board[x][cy] = 1
@@ -339,6 +347,10 @@ class Game(arcade.View):
                             self.Bot_Location[1] = y+1
                             break
                 elif cx > bx and cy == by:
+                    if cx == 9:              #Right Side Corner case
+                        board[cx][cy] = 2
+                        self.Bot_Location = box
+                        return
                     for x in range(cx+1, 10, 1):
                         if x == 9:
                             board[x][cy] = 2
@@ -351,6 +363,10 @@ class Game(arcade.View):
                             self.Bot_Location[1] = cy
                             break
                 elif cx < bx and cy == by:
+                    if cx == 0:              #Left Side Corner case
+                        board[cx][cy] = 2
+                        self.Bot_Location = box
+                        return
                     for x in range(cx-1, -1, -1):
                         if x == 0:
                             board[x][cy] = 2
