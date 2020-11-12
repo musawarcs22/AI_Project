@@ -6,6 +6,8 @@ humanSnail = arcade.load_texture("Images/snail1.png") # image of human's snail
 botSnail = arcade.load_texture("Images/snail2.png") # image of bots's snail
 humanSplash = arcade.load_texture("Images/splash_snail1.png") # image of Human's Splash
 botSplash = arcade.load_texture("Images/splash_snail2.png") # image of Bot's Splash
+drawEmoji = arcade.load_texture("Images/thinking.png") # image of Draw State Emoji
+menuEmoji = arcade.load_texture("Images/menuBack.jpg") # image of menu_screen
 
 ROWS = 10 # number of rows in the grid
 COLUMNS = 10 # number of columns in the grid
@@ -230,10 +232,7 @@ class Game(arcade.View):
             self.Bot_Location = box     
             self.bot_score += 1         #Increasing Bot Score
         """
-        #for i in range(5,0,-1):
-         #   print(i)
-        
-        
+       
         
         # print("\n\n\n---box = {0}".format(box))
         #Present Location of Bot 
@@ -282,7 +281,8 @@ class Game(arcade.View):
                         self.human_Location = box
                         return
                     for x in range(cx+1, 10, 1):
-                        if x == 9:
+                        if x == 9 and board[x][cy] == 10:
+                            board[x][cy] = 1 
                             self.human_Location[0] = x
                             self.human_Location[1] = cy
                             break
@@ -350,9 +350,11 @@ class Game(arcade.View):
                     if cx == 9:              #Right Side Corner case
                         board[cx][cy] = 2
                         self.Bot_Location = box
+                        
                         return
                     for x in range(cx+1, 10, 1):
                         if x == 9:
+                            print("Chaladadasdw")
                             board[x][cy] = 2
                             self.Bot_Location[0] = x
                             self.Bot_Location[1] = cy
@@ -395,7 +397,8 @@ class Game(arcade.View):
         print()
         
     def on_show(self):
-        arcade.set_background_color(arcade.color.WOOD_BROWN) #Background color
+        arcade.set_background_color(arcade.color.SKY_BLUE) #Background color
+        
 
     def on_draw(self):
         arcade.start_render()
@@ -403,12 +406,16 @@ class Game(arcade.View):
         # self.shape_list.draw()
 
         if self.game_state == "GameMenu":
-            arcade.draw_text("Menu Screen", SCREEN_WIDTH/2, SCREEN_HEIGHT/2,
+            arcade.draw_lrwh_rectangle_textured(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, menuEmoji)
+            arcade.draw_text("Well Come :)", SCREEN_WIDTH-400, SCREEN_HEIGHT-100,
                          arcade.color.BLACK, font_size=50, anchor_x="center") # These for writing text on screen
-            arcade.draw_text("Click to Start Game", SCREEN_WIDTH/2, SCREEN_HEIGHT/2-75,
+            arcade.draw_text("Start Game(Click here)", SCREEN_WIDTH-400, SCREEN_HEIGHT/2-200,
                          arcade.color.GRAY, font_size=20, anchor_x="center")
+            
 
         elif self.game_state == "GameOn":
+            
+            
 
             # setting the background image
             arcade.draw_lrwh_rectangle_textured(0, 0, game_SCREEN_WIDTH, game_SCREEN_HEIGHT, background)
@@ -420,27 +427,35 @@ class Game(arcade.View):
                 arcade.draw_line(y, 0, y, 600, arcade.color.BLACK, 4)
 
             # arcade.draw_lrwh_rectangle_textured(0, 0, game_SCREEN_WIDTH, game_SCREEN_HEIGHT, background)
-            arcade.set_background_color(arcade.color.WHITE)
+            #arcade.set_background_color(arcade.color.WHITE)
+            arcade.set_background_color(arcade.color.WOOD_BROWN) #Background color 
             arcade.draw_text("Human Score", (game_SCREEN_WIDTH/2)+400, (game_SCREEN_HEIGHT/2)+150,
-                         arcade.color.BLACK, font_size=15, anchor_x="center")
+                         arcade.color.DEEP_SKY_BLUE, font_size=20, anchor_x="center")
             arcade.draw_text(str("Bot Score"), (game_SCREEN_WIDTH/2)+400, (game_SCREEN_HEIGHT/2)+50,
-                        arcade.color.BLACK, font_size=15, anchor_x="center")
-            arcade.draw_text(str("Turn"), (game_SCREEN_WIDTH/2)+400, (game_SCREEN_HEIGHT/2)-50,
-                        arcade.color.BLACK, font_size=15, anchor_x="center")
+                        arcade.color.LIGHT_PINK, font_size=20, anchor_x="center")
+            
+            
+            if self.turn == 1000:
+                arcade.draw_text(str("-->Turn<--"), (game_SCREEN_WIDTH/2)+400, (game_SCREEN_HEIGHT/2)-50,
+                        arcade.color.DEEP_SKY_BLUE, font_size=25, anchor_x="center")
+            else:
+                arcade.draw_text(str("-->Turn<--"), (game_SCREEN_WIDTH/2)+400, (game_SCREEN_HEIGHT/2)-50,
+                        arcade.color.LIGHT_PINK, font_size=25, anchor_x="center")
+            
 
             #These for loops are maping background 2D Matrix with Front End Grid.
             for i in range(10):
                 for j in range(10):
                     arcade.draw_text(str(self.human_score), (game_SCREEN_WIDTH/2)+400, (game_SCREEN_HEIGHT/2)+100,
-                         arcade.color.BLACK, font_size=15, anchor_x="center")
+                         arcade.color.DEEP_SKY_BLUE, font_size=15, anchor_x="center" )
                     arcade.draw_text(str(self.bot_score), (game_SCREEN_WIDTH/2)+400, (game_SCREEN_HEIGHT/2),
-                         arcade.color.BLACK, font_size=15, anchor_x="center")
+                         arcade.color.LIGHT_PINK, font_size=15, anchor_x="center")
                     if self.turn == 1000:
                         arcade.draw_text("Human", (game_SCREEN_WIDTH/2)+400, (game_SCREEN_HEIGHT/2)-100,
-                         arcade.color.BLACK, font_size=15, anchor_x="center")
+                         arcade.color.DEEP_SKY_BLUE, font_size=20, font_name='comic', anchor_x="center")
                     if self.turn == 2000:
                         arcade.draw_text("Bot", (game_SCREEN_WIDTH/2)+400, (game_SCREEN_HEIGHT/2)-100,
-                         arcade.color.BLACK, font_size=15, anchor_x="center")
+                         arcade.color.LIGHT_PINK, font_size=20, font_name='comic', anchor_x="center")
                     if board[i][j] == 1:
                         arcade.draw_lrwh_rectangle_textured(G_SIZE*i+5, G_SIZE*j, G_SIZE-10, G_SIZE-10, humanSnail)
                     elif board[i][j] == 2:
@@ -451,23 +466,26 @@ class Game(arcade.View):
                         arcade.draw_lrwh_rectangle_textured(G_SIZE*i+5, G_SIZE*j, G_SIZE-10, G_SIZE-10, botSplash)
         
         elif self.game_state == "Draw":
-            arcade.set_background_color(arcade.color.WOOD_BROWN)
+            arcade.set_background_color(arcade.color.BISQUE)
             arcade.draw_text("Game Over", SCREEN_WIDTH/2, SCREEN_HEIGHT/2,
                          arcade.color.BLACK, font_size=50, anchor_x="center") # These for writing text on screen
-            arcade.draw_text("Draw", SCREEN_WIDTH/2, SCREEN_HEIGHT/2-75,
-                         arcade.color.GRAY, font_size=25, anchor_x="center")
+            arcade.draw_text("It's a Draw :(", SCREEN_WIDTH/2, SCREEN_HEIGHT/2-75,
+                         arcade.color.GRAY, font_size=30, bold=True, anchor_x="center")
+            arcade.draw_lrwh_rectangle_textured(325, 400, 200, 200, drawEmoji)
         elif self.game_state == "HumanWon":
-            arcade.set_background_color(arcade.color.WOOD_BROWN)
+            arcade.set_background_color(arcade.color.DEEP_SKY_BLUE)
             arcade.draw_text("Game Over", SCREEN_WIDTH/2, SCREEN_HEIGHT/2,
                          arcade.color.BLACK, font_size=50, anchor_x="center") # These for writing text on screen
             arcade.draw_text("Human Won", SCREEN_WIDTH/2, SCREEN_HEIGHT/2-75,
-                         arcade.color.GRAY, font_size=25, anchor_x="center")
+                         arcade.color.GRAY, font_size=30, anchor_x="center")
+            arcade.draw_lrwh_rectangle_textured(325, 400, 200, 200, humanSnail)
         elif self.game_state == "BotWon":
-            arcade.set_background_color(arcade.color.WOOD_BROWN)
+            arcade.set_background_color(arcade.color.LIGHT_PINK)
             arcade.draw_text("Game Over", SCREEN_WIDTH/2, SCREEN_HEIGHT/2,
                          arcade.color.BLACK, font_size=50, anchor_x="center") # These for writing text on screen
             arcade.draw_text("Bot Won", SCREEN_WIDTH/2, SCREEN_HEIGHT/2-75,
-                         arcade.color.GRAY, font_size=25, anchor_x="center")
+                         arcade.color.GRAY, font_size=30, anchor_x="center")
+            arcade.draw_lrwh_rectangle_textured(325, 400, 200, 200, botSnail)             
 
 def main():
 
