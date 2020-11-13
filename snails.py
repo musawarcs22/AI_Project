@@ -250,7 +250,7 @@ class Game(arcade.View):
             self.human_score += 1 #Increasing Human Score     
             self.turn = 2000      #Changing Turn
             if board[cx][cy] == 10: #This will execute when the Human clicks on his Splash(Slippery Functionality for Human)
-                
+                self.human_score -= 1 #No Score should be increased if clicked on splash 
                 if hx == cx and cy > hy:
                     for y in range(hy+1, 10, 1):
                         if y == 9 and board[cx][y]==10:
@@ -297,7 +297,7 @@ class Game(arcade.View):
                         self.human_Location = box
                         return
                     for x in range(cx-1, -1, -1):
-                        if x == 0:
+                        if x == 0 and board[x][cy] == 10:
                             board[x][cy] = 1
                             self.human_Location[0] = x
                             self.human_Location[1] = cy
@@ -322,6 +322,7 @@ class Game(arcade.View):
             self.turn = 1000         #Fliping turn       
             self.bot_score += 1      #Increasing Bot Score 
             if board[cx][cy] == 20:  #This will execute when the Bot clicks on his Splash(Slippery Functionality for Bot)   
+                self.bot_score -= 1  #Scores should not be added in this case
                 if bx == cx and cy > by:
                     for y in range(by+1, 10, 1):
                         if y == 9 and board[cx][y] == 20:
@@ -350,11 +351,9 @@ class Game(arcade.View):
                     if cx == 9:              #Right Side Corner case
                         board[cx][cy] = 2
                         self.Bot_Location = box
-                        
                         return
                     for x in range(cx+1, 10, 1):
-                        if x == 9:
-                            print("Chaladadasdw")
+                        if x == 9 and board[x][cy] == 20:
                             board[x][cy] = 2
                             self.Bot_Location[0] = x
                             self.Bot_Location[1] = cy
@@ -370,7 +369,7 @@ class Game(arcade.View):
                         self.Bot_Location = box
                         return
                     for x in range(cx-1, -1, -1):
-                        if x == 0:
+                        if x == 0 and board[x][cy] == 20:
                             board[x][cy] = 2
                             self.Bot_Location[0] = x
                             self.Bot_Location[1] = cy
