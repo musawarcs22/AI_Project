@@ -432,9 +432,9 @@ class Game(arcade.View):
             arcade.draw_text(str(self.human_score), (game_SCREEN_WIDTH/2)+400, (game_SCREEN_HEIGHT/2)+100,
                  arcade.color.DEEP_SKY_BLUE, font_size=15, anchor_x="center")
             arcade.draw_text(str("Bot Score"), (game_SCREEN_WIDTH/2)+400, (game_SCREEN_HEIGHT/2)+50,
-                        arcade.color.LIGHT_PINK, font_size=20, anchor_x="center")
+                        arcade.color.DARK_RED, font_size=20, anchor_x="center")
             arcade.draw_text(str(self.bot_score), (game_SCREEN_WIDTH/2)+400, (game_SCREEN_HEIGHT/2),
-                 arcade.color.LIGHT_PINK, font_size=15, anchor_x="center")
+                 arcade.color.DARK_RED, font_size=15, anchor_x="center")
             
             
             if self.turn == 1000:
@@ -444,9 +444,9 @@ class Game(arcade.View):
                  arcade.color.DEEP_SKY_BLUE, font_size=20, font_name='comic', anchor_x="center")
             else:
                 arcade.draw_text(str("-->Turn<--"), (game_SCREEN_WIDTH/2)+400, (game_SCREEN_HEIGHT/2)-50,
-                        arcade.color.LIGHT_PINK, font_size=25, anchor_x="center")
+                        arcade.color.DARK_RED, font_size=25, anchor_x="center")
                 arcade.draw_text("Bot", (game_SCREEN_WIDTH/2)+400, (game_SCREEN_HEIGHT/2)-100,
-                 arcade.color.LIGHT_PINK, font_size=20, font_name='comic', anchor_x="center")
+                 arcade.color.DARK_RED, font_size=20, font_name='comic', anchor_x="center")
             
             #These for loops are maping background 2D Matrix with Front End Grid.
             for i in range(10):
