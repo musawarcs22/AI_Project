@@ -63,21 +63,29 @@ class Game(arcade.View):
         print()
   
     def evaluateBoard(self):
-        if self.bot_score == 50 and self.human_score == 50:
-            self.game_state = "Draw"
-           # return 5 # for Draw State
-        elif self.bot_score > 50:
-            self.game_state = "BotWon"
-            #return 10 # for Bot Win
-        elif self.human_score > 50:
-            self.game_state = "HumanWon"
-            #return 1 # for Human Win
-        else:
-            for i in range(10):
-                for j in range(10):
-                    if board[i][j] == 0:
-                        self.state = 0  # Continue State
-            #            return 0          game_state = "GameOn" is Continue State
+        H_count = 0
+        B_count = 0
+        for i in range(ROWS):
+            for i in range(COLUMNS):
+                if board[i][j] == 10:
+                    H_count += 1
+        for i in range(ROWS):
+            for i in range(COLUMNS):
+                if board[i][j] == 10:
+                    B_count += 1
+        if H_count > 50:
+            return 1
+        if B_count > 50:
+            return -1
+        if H_count == 50 and B_count == 50:
+            return 0
+
+    def isMoveLeft(self):
+        for i in range(ROWS):
+            for i in range(COLUMNS):
+                if board[i][j] == 0:
+                    return True
+        return False
 
     def on_key_press(self, key, modifiers):
         pass
@@ -138,10 +146,6 @@ class Game(arcade.View):
                         if (top == 1 or left == 1):
                             return True
                         return False
-                    elif x == 9 and y == 9:
-                        if (bottom == 1 or left == 1):
-                            return True
-                        return False
                     elif x == 9 or x == 0 or y == 0 or y == 9:
                         if x == 0:
                             if (top == 1 or bottom == 1 or right == 1):
@@ -175,10 +179,6 @@ class Game(arcade.View):
                         if (top == 2 or left == 2):
                             return True
                         return False
-                    elif x == 9 and y == 9:
-                        if (bottom == 2 or left == 2):
-                            return True
-                        return False   
                     elif x == 9 or x == 0 or y == 0 or y == 9:
                         if x == 0:
                             if (top == 2 or bottom == 2 or right == 2 ):
@@ -217,26 +217,8 @@ class Game(arcade.View):
         box[x,y] is the location where Snail needs to be placed. 
         """
 
-        """
-       # print("\n\n\n---box = {0}".format(box))
-        if self.turn == 1000:
-            board[self.human_Location[0]][self.human_Location[1]] = 10
-            board[box[0]][box[1]] = 1
-            self.turn = 2000
-            self.human_Location = box
-            self.human_score += 1        #Increasing Human Score
-        if self.turn == 2000:
-            board[self.Bot_Location[0]][self.Bot_Location[1]] = 20
-            board[box[0]][box[1]] = 2    
-            self.turn = 1000
-            self.Bot_Location = box     
-            self.bot_score += 1         #Increasing Bot Score
-        """
-       
-        
-        # print("\n\n\n---box = {0}".format(box))
         #Present Location of Bot 
-        bx = self.Bot_Location[0] 
+        bx = self.Bot_Location[0]
         by = self.Bot_Location[1]
         #Present Location of Human 
         hx = self.human_Location[0]
@@ -245,12 +227,12 @@ class Game(arcade.View):
         cx = box[0]
         cy = box[1]
         #----------------------------------------------------
-        if self.turn == 1000:     #-------> HUMAN's TURN <------------
+        if self.turn == 1000:   #-------> HUMAN's TURN <------------
             board[hx][hy] = 10    #Placing Splash on the Present human Location 
             self.human_score += 1 #Increasing Human Score     
             self.turn = 2000      #Changing Turn
             if board[cx][cy] == 10: #This will execute when the Human clicks on his Splash(Slippery Functionality for Human)
-                self.human_score -= 1 #No Score should be increased if clicked on splash 
+                
                 if hx == cx and cy > hy:
                     for y in range(hy+1, 10, 1):
                         if y == 9 and board[cx][y]==10:
@@ -297,7 +279,7 @@ class Game(arcade.View):
                         self.human_Location = box
                         return
                     for x in range(cx-1, -1, -1):
-                        if x == 0 and board[x][cy] == 10:
+                        if x == 0:
                             board[x][cy] = 1
                             self.human_Location[0] = x
                             self.human_Location[1] = cy
@@ -308,7 +290,7 @@ class Game(arcade.View):
                             self.human_Location[1] = cy
                             break
                 elif cx == hx and cy == hy: #When Player will click on itself it will lose the turn and scores will remain the same
-                    self.human_score -= 1 
+                    self.human_score -= 1
                 #----------------------------------------------------------------------------
                 
             else:                   #This will execute When Human clicks Empty Square
@@ -319,10 +301,9 @@ class Game(arcade.View):
                 #----------------------------------------------------------------------------
         elif self.turn == 2000:      #-----> BOT's TURN <-----
             board[bx][by] = 20       #Putting Splash on the Bot Location
-            self.turn = 1000         #Fliping turn       
             self.bot_score += 1      #Increasing Bot Score 
+            self.turn = 1000         #Fliping turn       
             if board[cx][cy] == 20:  #This will execute when the Bot clicks on his Splash(Slippery Functionality for Bot)   
-                self.bot_score -= 1  #Scores should not be added in this case
                 if bx == cx and cy > by:
                     for y in range(by+1, 10, 1):
                         if y == 9 and board[cx][y] == 20:
@@ -351,9 +332,11 @@ class Game(arcade.View):
                     if cx == 9:              #Right Side Corner case
                         board[cx][cy] = 2
                         self.Bot_Location = box
+                        
                         return
                     for x in range(cx+1, 10, 1):
-                        if x == 9 and board[x][cy] == 20:
+                        if x == 9:
+                            print("Chaladadasdw")
                             board[x][cy] = 2
                             self.Bot_Location[0] = x
                             self.Bot_Location[1] = cy
@@ -369,7 +352,7 @@ class Game(arcade.View):
                         self.Bot_Location = box
                         return
                     for x in range(cx-1, -1, -1):
-                        if x == 0 and board[x][cy] == 20:
+                        if x == 0:
                             board[x][cy] = 2
                             self.Bot_Location[0] = x
                             self.Bot_Location[1] = cy
@@ -398,7 +381,6 @@ class Game(arcade.View):
     def on_show(self):
         arcade.set_background_color(arcade.color.SKY_BLUE) #Background color
         
-
     def on_draw(self):
         arcade.start_render()
         # self.shape_list = arcade.ShapeElementList()
@@ -432,9 +414,9 @@ class Game(arcade.View):
             arcade.draw_text(str(self.human_score), (game_SCREEN_WIDTH/2)+400, (game_SCREEN_HEIGHT/2)+100,
                  arcade.color.DEEP_SKY_BLUE, font_size=15, anchor_x="center")
             arcade.draw_text(str("Bot Score"), (game_SCREEN_WIDTH/2)+400, (game_SCREEN_HEIGHT/2)+50,
-                        arcade.color.DARK_RED, font_size=20, anchor_x="center")
+                        arcade.color.LIGHT_PINK, font_size=20, anchor_x="center")
             arcade.draw_text(str(self.bot_score), (game_SCREEN_WIDTH/2)+400, (game_SCREEN_HEIGHT/2),
-                 arcade.color.DARK_RED, font_size=15, anchor_x="center")
+                 arcade.color.LIGHT_PINK, font_size=15, anchor_x="center")
             
             
             if self.turn == 1000:
@@ -444,9 +426,9 @@ class Game(arcade.View):
                  arcade.color.DEEP_SKY_BLUE, font_size=20, font_name='comic', anchor_x="center")
             else:
                 arcade.draw_text(str("-->Turn<--"), (game_SCREEN_WIDTH/2)+400, (game_SCREEN_HEIGHT/2)-50,
-                        arcade.color.DARK_RED, font_size=25, anchor_x="center")
+                        arcade.color.LIGHT_PINK, font_size=25, anchor_x="center")
                 arcade.draw_text("Bot", (game_SCREEN_WIDTH/2)+400, (game_SCREEN_HEIGHT/2)-100,
-                 arcade.color.DARK_RED, font_size=20, font_name='comic', anchor_x="center")
+                 arcade.color.LIGHT_PINK, font_size=20, font_name='comic', anchor_x="center")
             
             #These for loops are maping background 2D Matrix with Front End Grid.
             for i in range(10):
