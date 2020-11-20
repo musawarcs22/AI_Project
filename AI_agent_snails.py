@@ -527,7 +527,7 @@ def main():
     window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT,SCREEN_TITLE)
     game_view = Game()
     game_view.heuristic()
-    # window.show_view(game_view)
-    # arcade.run()
+    window.show_view(game_view)
+    arcade.run()
     
 main()
