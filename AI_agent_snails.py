@@ -1,4 +1,5 @@
 import arcade
+import random
 
 # Loading needed images
 background = arcade.load_texture("Images/BC.jpg") # background image
@@ -83,9 +84,66 @@ class Game(arcade.View):
     def isMoveLeft(self):
         for i in range(ROWS):
             for i in range(COLUMNS):
+                
                 if board[i][j] == 0:
                     return True
         return False
+
+    def heuristic(self):
+        x, y, rightBoxes, leftBoxes, topBoxes, bottomBoxes = 0, 0, 0, 0, 0, 0
+        left, right, top, bottom = 'left', 'right', 'top', 'bottom'
+
+        for i in range(ROWS):
+            for j in range(COLUMNS):
+                if board[i][j] == self.bot:
+                    x, y = i, j            #giving index of bot position
+                    break
+        
+        #below loops are counting zero boxes on all four sides of the bot
+        for i in range(x+1, 10, 1):
+            if board[i][y] == 0 and ((board[i][y] != self.human or board[i][y] != self.botSplash) or board[i][y] != self.humanSnail):
+                rightBoxes += 1
+            else:
+                break
+        for i in range(x-1, -1, -1):
+            if board[i][y] == 0 and ((board[i][y] != self.human or board[i][y] != self.botSplash) or board[i][y] != self.humanSnail):
+                leftBoxes += 1
+            else:
+                break
+        for j in range(y+1, 10, 1):
+            if board[x][j] == 0 and ((board[x][j] != self.human or board[x][j] != self.botSplash) or board[x][j] != self.humanSnail):
+                topBoxes += 1
+            else:
+                break
+        for j in range(y-1, -1, -1):
+            if board[x][j] == 0 and ((board[x][j] != self.human or board[x][j] != self.botSplash) or board[x][j] != self.humanSnail):
+                bottomBoxes += 1
+            else:
+                break
+
+        #conditions checking where the bot should move
+        if topBoxes > bottomBoxes:
+            if leftBoxes >= rightBoxes:
+                if topBoxes > leftBoxes:
+                    return top
+                else:
+                    return left
+            else:
+                if topBoxes > rightBoxes:
+                    return top
+                else:
+                    return right
+        else:
+            if leftBoxes >= rightBoxes:
+                if bottomBoxes >= leftBoxes:
+                    return bottom
+                else:
+                    return left
+            else:
+                if bottomBoxes >= rightBoxes:
+                    return bottom
+                else:
+                    return right
 
     def on_key_press(self, key, modifiers):
         pass
@@ -468,7 +526,8 @@ def main():
 
     window = arcade.Window(SCREEN_WIDTH, SCREEN_HEIGHT,SCREEN_TITLE)
     game_view = Game()
-    window.show_view(game_view)
-    arcade.run()
+    game_view.heuristic()
+    # window.show_view(game_view)
+    # arcade.run()
     
 main()
