@@ -90,9 +90,7 @@ class Game(arcade.View):
         return False
 
     def heuristic(self):
-
         x, y, visitedBoxes, rightBoxes, leftBoxes, topBoxes, bottomBoxes, winningChances = 0, 0, 0, 0, 0, 0, 0, 0
-
         # Calculate the number of visited boxes by AI Agent and add them to the variable ‘winnigChances’.
         for i in range(ROWS):
             for j in range(COLUMNS):
@@ -101,14 +99,12 @@ class Game(arcade.View):
                 else:
                     continue
         winningChances += visitedBoxes
-
         #giving index of bot position
         for i in range(ROWS):
             for j in range(COLUMNS):
                 if board[i][j] == self.bot:
                     x, y = i, j
                     break
-        
         #below loops are counting zero boxes on all four sides of the bot
         for i in range(x+1, 10, 1):
             if board[i][y] == 0 and ((board[i][y] != self.human or board[i][y] != self.botSplash) or board[i][y] != self.humanSnail):
@@ -130,14 +126,11 @@ class Game(arcade.View):
                 bottomBoxes += 1
             else:
                 break
-
         #The number of empty boxes will be added to the variable ‘winnigChances’
         winningChances += max(rightBoxes, leftBoxes, topBoxes, bottomBoxes)
-
         # 10 will be added to the variable ‘winnigChances’ if bot is in central area.
         if((x != 0 and x != 9) and (y != 9 and y != 9)):
             winningChances += 10
-
         return winningChances
 
     def on_key_press(self, key, modifiers):
