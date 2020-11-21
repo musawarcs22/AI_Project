@@ -97,7 +97,7 @@ class Game(arcade.View):
         for i in range(ROWS):
             for j in range(COLUMNS):
                 if board[i][j] == self.botSplash:
-                    visitedBoxes += 1            #giving index of bot position
+                    visitedBoxes += 1
                 else:
                     continue
         winningChances += visitedBoxes
