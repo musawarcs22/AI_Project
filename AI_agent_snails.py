@@ -90,13 +90,23 @@ class Game(arcade.View):
         return False
 
     def heuristic(self):
-        x, y, rightBoxes, leftBoxes, topBoxes, bottomBoxes = 0, 0, 0, 0, 0, 0
-        left, right, top, bottom = 'left', 'right', 'top', 'bottom'
 
+        x, y, visitedBoxes, rightBoxes, leftBoxes, topBoxes, bottomBoxes, winningChances = 0, 0, 0, 0, 0, 0, 0, 0
+
+        # Calculate the number of visited boxes by AI Agent and add them to the variable ‘winnigChances’.
+        for i in range(ROWS):
+            for j in range(COLUMNS):
+                if board[i][j] == self.botSplash:
+                    visitedBoxes += 1            #giving index of bot position
+                else:
+                    continue
+        winningChances += visitedBoxes
+
+        #giving index of bot position
         for i in range(ROWS):
             for j in range(COLUMNS):
                 if board[i][j] == self.bot:
-                    x, y = i, j            #giving index of bot position
+                    x, y = i, j
                     break
         
         #below loops are counting zero boxes on all four sides of the bot
@@ -121,29 +131,14 @@ class Game(arcade.View):
             else:
                 break
 
-        #conditions checking where the bot should move
-        if topBoxes > bottomBoxes:
-            if leftBoxes >= rightBoxes:
-                if topBoxes > leftBoxes:
-                    return top
-                else:
-                    return left
-            else:
-                if topBoxes > rightBoxes:
-                    return top
-                else:
-                    return right
-        else:
-            if leftBoxes >= rightBoxes:
-                if bottomBoxes >= leftBoxes:
-                    return bottom
-                else:
-                    return left
-            else:
-                if bottomBoxes >= rightBoxes:
-                    return bottom
-                else:
-                    return right
+        #The number of empty boxes will be added to the variable ‘winnigChances’
+        winningChances += max(rightBoxes, leftBoxes, topBoxes, bottomBoxes)
+
+        # 10 will be added to the variable ‘winnigChances’ if bot is in central area.
+        if((x != 0 and x != 9) and (y != 9 and y != 9)):
+            winningChances += 10
+
+        return winningChances
 
     def on_key_press(self, key, modifiers):
         pass
