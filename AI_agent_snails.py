@@ -6,7 +6,7 @@ background = arcade.load_texture("Images/BC.jpg") # background image
 humanSnail = arcade.load_texture("Images/snail1.png") # image of human's snail
 botSnail = arcade.load_texture("Images/snail2.png") # image of bots's snail
 humanSplash = arcade.load_texture("Images/splash_snail1.png") # image of Human's Splash
-botSplash = arcade.load_texture("Images/splash_snail2.png") # image of Bot's Splash
+bot_Splash = arcade.load_texture("Images/splash_snail2.png") # image of Bot's Splash
 drawEmoji = arcade.load_texture("Images/thinking.png") # image of Draw State Emoji
 menuEmoji = arcade.load_texture("Images/menuBack.jpg") # image of menu_screen
 
@@ -62,16 +62,33 @@ class Game(arcade.View):
         	for i in range(COLUMNS):
         		print(board[i][j], end="\t")
         print()
-  
+
     def evaluateBoard(self):
+        if self.bot_score == 50 and self.human_score == 50:
+            self.game_state = "Draw"
+           # return 5 # for Draw State
+        elif self.bot_score > 50:
+            self.game_state = "BotWon"
+            #return 10 # for Bot Win
+        elif self.human_score > 50:
+            self.game_state = "HumanWon"
+            #return 1 # for Human Win
+        else:
+            for i in range(10):
+                for j in range(10):
+                    if board[i][j] == 0:
+                        self.state = 0  # Continue State
+            #            return 0          game_state = "GameOn" is Continue State
+
+    def evaluateBoard_AI(self):
         H_count = 0
         B_count = 0
         for i in range(ROWS):
-            for i in range(COLUMNS):
+            for j in range(COLUMNS):
                 if board[i][j] == 10:
                     H_count += 1
         for i in range(ROWS):
-            for i in range(COLUMNS):
+            for j in range(COLUMNS):
                 if board[i][j] == 10:
                     B_count += 1
         if H_count > 50:
@@ -83,8 +100,8 @@ class Game(arcade.View):
 
     def isMoveLeft(self):
         for i in range(ROWS):
-            for i in range(COLUMNS):
-                
+            for j in range(COLUMNS):
+
                 if board[i][j] == 0:
                     return True
         return False
@@ -99,7 +116,7 @@ class Game(arcade.View):
         # Calculate the number of visited boxes by AI Agent and add them to the variable ‘winnigChances’.
         for i in range(ROWS):
             for j in range(COLUMNS):
-                if board[i][j] == self.botSplash:
+                if board[i][j] == self.bot_Splash:
                     visitedBoxes += 1
                 else:
                     continue
@@ -114,22 +131,22 @@ class Game(arcade.View):
         
         #below loops are counting zero boxes on all four sides of the bot
         for i in range(x+1, 10, 1):
-            if board[i][y] == 0 and ((board[i][y] != self.human or board[i][y] != self.botSplash) or board[i][y] != self.humanSnail):
+            if board[i][y] == 0 and ((board[i][y] != self.human or board[i][y] != self.bot_Splash) or board[i][y] != self.human_Splash):
                 rightBoxes += 1
             else:
                 break
         for i in range(x-1, -1, -1):
-            if board[i][y] == 0 and ((board[i][y] != self.human or board[i][y] != self.botSplash) or board[i][y] != self.humanSnail):
+            if board[i][y] == 0 and ((board[i][y] != self.human or board[i][y] != self.bot_Splash) or board[i][y] != self.human_Splash):
                 leftBoxes += 1
             else:
                 break
         for j in range(y+1, 10, 1):
-            if board[x][j] == 0 and ((board[x][j] != self.human or board[x][j] != self.botSplash) or board[x][j] != self.humanSnail):
+            if board[x][j] == 0 and ((board[x][j] != self.human or board[x][j] != self.bot_Splash) or board[x][j] != self.human_Splash):
                 topBoxes += 1
             else:
                 break
         for j in range(y-1, -1, -1):
-            if board[x][j] == 0 and ((board[x][j] != self.human or board[x][j] != self.botSplash) or board[x][j] != self.humanSnail):
+            if board[x][j] == 0 and ((board[x][j] != self.human or board[x][j] != self.bot_Splash) or board[x][j] != self.human_Splash):
                 bottomBoxes += 1
             else:
                 break
@@ -143,6 +160,26 @@ class Game(arcade.View):
         
         return winningChances
 
+    def bot_move(self):
+        """
+        This function is updating backend 2d matrix and player scores.
+        box[x,y] is the location where Snail needs to be placed. 
+        """
+
+        #Present Location of Bot 
+        bx = self.Bot_Location[0]
+        by = self.Bot_Location[1]
+        #Present Location of Human 
+        hx = self.human_Location[0]
+        hy = self.human_Location[1]
+        #Desired Location where the mouse is clicked 
+        
+
+
+
+        if self.isMoveLeft():
+            pass
+
     def on_key_press(self, key, modifiers):
         pass
             
@@ -155,14 +192,13 @@ class Game(arcade.View):
             if(self.is_Legal_Move(box)):
                 self.update_grid(box)
                 self.evaluateBoard()
-            else:
+                self.bot_move()
+            else: #This else will execute in case the move is illegal. 
                 if self.turn == 1000:
                     self.human_score -= 1
-                    self.turn = 2000
+                    self.bot_move()
 
-                elif self.turn == 2000:
-                    self.bot_score -= 1
-                    self.turn = 1000
+                
             
     def is_Legal_Move(self,box):
         #Clicking on grid line (Not Checking and not needed)
@@ -496,7 +532,7 @@ class Game(arcade.View):
                     elif board[i][j] == 10:
                         arcade.draw_lrwh_rectangle_textured(G_SIZE*i+5, G_SIZE*j, G_SIZE-10, G_SIZE-10, humanSplash)
                     elif board[i][j] == 20:
-                        arcade.draw_lrwh_rectangle_textured(G_SIZE*i+5, G_SIZE*j, G_SIZE-10, G_SIZE-10, botSplash)
+                        arcade.draw_lrwh_rectangle_textured(G_SIZE*i+5, G_SIZE*j, G_SIZE-10, G_SIZE-10, bot_Splash)
         
         elif self.game_state == "Draw":
             arcade.set_background_color(arcade.color.BISQUE)
