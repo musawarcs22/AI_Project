@@ -89,6 +89,9 @@ class Game(arcade.View):
                     return True
         return False
 
+    def minimax(self, depth, maxlevel):
+        pass
+
     def heuristic(self):
         
         x, y, visitedBoxes, rightBoxes, leftBoxes, topBoxes, bottomBoxes, winningChances = 0, 0, 0, 0, 0, 0, 0, 0
