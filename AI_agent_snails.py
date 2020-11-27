@@ -6,7 +6,7 @@ background = arcade.load_texture("Images/BC.jpg") # background image
 humanSnail = arcade.load_texture("Images/snail1.png") # image of human's snail
 botSnail = arcade.load_texture("Images/snail2.png") # image of bots's snail
 humanSplash = arcade.load_texture("Images/splash_snail1.png") # image of Human's Splash
-bot_Splash = arcade.load_texture("Images/splash_snail2.png") # image of Bot's Splash
+botSplash = arcade.load_texture("Images/splash_snail2.png") # image of Bot's Splash
 drawEmoji = arcade.load_texture("Images/thinking.png") # image of Draw State Emoji
 menuEmoji = arcade.load_texture("Images/menuBack.jpg") # image of menu_screen
 
@@ -35,7 +35,7 @@ class Game(arcade.View):
         self.human = 1
         self.bot = 2
         self.human_Splash = 10
-        self.bot_Splash = 20
+        self.botSplash = 20
 
         self.state = 0 # Other states can be 50(for Draw), 100(Human Win), 200(Bot win)
         self.game_state = "GameMenu" #Setting this to show menu Screen 
@@ -155,7 +155,7 @@ class Game(arcade.View):
         # Calculate the number of visited boxes by AI Agent and add them to the variable ‘winnigChances’.
         for i in range(ROWS):
             for j in range(COLUMNS):
-                if board[i][j] == self.bot_Splash:
+                if board[i][j] == self.botSplash:
                     visitedBoxes += 1
         winningChances += visitedBoxes
         
@@ -168,22 +168,22 @@ class Game(arcade.View):
         
         #below loops are counting zero boxes on all four sides of the bot
         for i in range(x+1, 10, 1):
-            if board[i][y] == 0 and ((board[i][y] != self.human or board[i][y] != self.bot_Splash) or board[i][y] != self.human_Splash):
+            if board[i][y] == 0 and ((board[i][y] != self.human or board[i][y] != self.botSplash) or board[i][y] != self.human_Splash):
                 rightBoxes += 1
             else:
                 break
         for i in range(x-1, -1, -1):
-            if board[i][y] == 0 and ((board[i][y] != self.human or board[i][y] != self.bot_Splash) or board[i][y] != self.human_Splash):
+            if board[i][y] == 0 and ((board[i][y] != self.human or board[i][y] != self.botSplash) or board[i][y] != self.human_Splash):
                 leftBoxes += 1
             else:
                 break
         for j in range(y+1, 10, 1):
-            if board[x][j] == 0 and ((board[x][j] != self.human or board[x][j] != self.bot_Splash) or board[x][j] != self.human_Splash):
+            if board[x][j] == 0 and ((board[x][j] != self.human or board[x][j] != self.botSplash) or board[x][j] != self.human_Splash):
                 topBoxes += 1
             else:
                 break
         for j in range(y-1, -1, -1):
-            if board[x][j] == 0 and ((board[x][j] != self.human or board[x][j] != self.bot_Splash) or board[x][j] != self.human_Splash):
+            if board[x][j] == 0 and ((board[x][j] != self.human or board[x][j] != self.botSplash) or board[x][j] != self.human_Splash):
                 bottomBoxes += 1
             else:
                 break
@@ -257,7 +257,53 @@ class Game(arcade.View):
             bottom_winingChance = self.heuristic(board)
             board[bx][by] = 2
             board[bx][by-1] = 0
-        
+
+        if (((top == 20 or bottom == 20) or (left == 20 or bottom == 20)) or ((top == 10 or bottom == 10) or (left == 10 or right == 10))) or ((top == 1 or bottom == 1) or (left == 1 or right == 1)):
+            for i in range(bx+1, 10, 1):
+                if board[i][by] == 0 or (board[i][by] == self.human or board[i][by] == self.human_Splash):
+                    if board[i][by] == 0:
+                        board[bx][by] = 20
+                        board[i][by] = 2
+                        right_winingChance = self.heuristic(board)
+                        board[bx][by] = 2
+                        board[i][by] = 0
+                        break
+                    right_winingChance = 0
+                    break
+            for i in range(bx-1, -1, -1):
+                if board[i][by] == 0 or (board[i][by] == self.human or board[i][by] == self.human_Splash):
+                    if board[i][by] == 0:
+                        board[bx][by] = 20
+                        board[i][by] = 2
+                        left_winingChance = self.heuristic(board)
+                        board[bx][by] = 2
+                        board[i][by] = 0
+                        break
+                    left_winingChance = 0
+                    break
+            for j in range(by+1, 10, 1):
+                if board[bx][j] == 0 or (board[bx][j] == self.human or board[bx][j] == self.human_Splash):
+                    if board[bx][j] == 0:
+                        board[bx][by] = 20
+                        board[bx][j] = 2
+                        top_winingChance = self.heuristic(board)
+                        board[bx][by] = 2
+                        board[bx][j] = 0
+                        break
+                    top_winingChance = 0
+                    break
+            for j in range(by-1, -1, -1):
+                if board[bx][j] == 0 or (board[bx][j] == self.human or board[bx][j] == self.human_Splash):
+                    if board[bx][j] == 0:
+                        board[bx][by] = 20
+                        board[bx][j] = 2
+                        bottom_winingChance = self.heuristic(board)
+                        board[bx][by] = 2
+                        board[bx][j] = 0
+                        break
+                    bottom_winingChance = 0
+                    break
+
         if left_winingChance == max(left_winingChance, right_winingChance, top_winingChance, bottom_winingChance):
             board[bx][by] = 20
             board[bx-1][by] = 2
@@ -495,6 +541,8 @@ class Game(arcade.View):
             
 
         elif self.game_state == "GameOn":
+            
+            
 
             # setting the background image
             arcade.draw_lrwh_rectangle_textured(0, 0, game_SCREEN_WIDTH, game_SCREEN_HEIGHT, background)
@@ -512,9 +560,9 @@ class Game(arcade.View):
             arcade.draw_text(str(self.human_score), (game_SCREEN_WIDTH/2)+400, (game_SCREEN_HEIGHT/2)+100,
                  arcade.color.DEEP_SKY_BLUE, font_size=15, anchor_x="center")
             arcade.draw_text(str("Bot Score"), (game_SCREEN_WIDTH/2)+400, (game_SCREEN_HEIGHT/2)+50,
-                        arcade.color.LIGHT_PINK, font_size=20, anchor_x="center")
+                        arcade.color.DARK_RED, font_size=20, anchor_x="center")
             arcade.draw_text(str(self.bot_score), (game_SCREEN_WIDTH/2)+400, (game_SCREEN_HEIGHT/2),
-                 arcade.color.LIGHT_PINK, font_size=15, anchor_x="center")
+                 arcade.color.DARK_RED, font_size=15, anchor_x="center")
             
             
             if self.turn == 1000:
@@ -524,9 +572,9 @@ class Game(arcade.View):
                  arcade.color.DEEP_SKY_BLUE, font_size=20, font_name='comic', anchor_x="center")
             else:
                 arcade.draw_text(str("-->Turn<--"), (game_SCREEN_WIDTH/2)+400, (game_SCREEN_HEIGHT/2)-50,
-                        arcade.color.LIGHT_PINK, font_size=25, anchor_x="center")
+                        arcade.color.DARK_RED, font_size=25, anchor_x="center")
                 arcade.draw_text("Bot", (game_SCREEN_WIDTH/2)+400, (game_SCREEN_HEIGHT/2)-100,
-                 arcade.color.LIGHT_PINK, font_size=20, font_name='comic', anchor_x="center")
+                 arcade.color.DARK_RED, font_size=20, font_name='comic', anchor_x="center")
             
             #These for loops are maping background 2D Matrix with Front End Grid.
             for i in range(10):
@@ -538,7 +586,7 @@ class Game(arcade.View):
                     elif board[i][j] == 10:
                         arcade.draw_lrwh_rectangle_textured(G_SIZE*i+5, G_SIZE*j, G_SIZE-10, G_SIZE-10, humanSplash)
                     elif board[i][j] == 20:
-                        arcade.draw_lrwh_rectangle_textured(G_SIZE*i+5, G_SIZE*j, G_SIZE-10, G_SIZE-10, bot_Splash)
+                        arcade.draw_lrwh_rectangle_textured(G_SIZE*i+5, G_SIZE*j, G_SIZE-10, G_SIZE-10, botSplash)
         
         elif self.game_state == "Draw":
             arcade.set_background_color(arcade.color.BISQUE)
