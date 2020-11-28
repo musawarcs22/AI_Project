@@ -64,32 +64,25 @@ class Game(arcade.View):
         print()
 
     def evaluateBoard_AI(self, board):
-        H_count = 0
-        B_count = 0
-
-        for i in range(10):
-            for j in range(10):
-                if board[i][j] == 10:
-                    H_count += 1
-        
-        for i in range(10):
-            for j in range(10):
-                if board[i][j] == 10:
-                    B_count += 1
-        
-        if B_count > 50:
-            self.game_state = "BotWon"
-            return 1
-        elif H_count > 50:
-            self.game_state = "HumanWon"
-            return -1
-        elif H_count == 50 and B_count == 50:
+        if self.bot_score == 50 and self.human_score == 50:
             self.game_state = "Draw"
             return 0
+           # return 5 # for Draw State
+        elif self.bot_score > 50:
+            self.game_state = "BotWon"
+            return 1
+            #return 10 # for Bot Win
+        elif self.human_score > 50:
+            self.game_state = "HumanWon"
+            return -1
+            #return 1 # for Human Win
         else:
-            if self.isMoveLeft(board):
-                self.state = 0
-                return None
+            for i in range(10):
+                for j in range(10):
+                    if board[i][j] == 0:
+                        self.state = 0
+                        return None  # Continue State
+            #            return 0          game_state = "GameOn" is Continue State
 
     def isMoveLeft(self, board):
         for i in range(ROWS):
@@ -99,7 +92,7 @@ class Game(arcade.View):
                     return True
         return False
 
-    def minimax(self, board, depth, isAgentTurn):
+    def minimax(self, board, depth, maxLevel, isAgentTurn):
         win = 1
         draw = 0
         lose = -1
@@ -125,7 +118,7 @@ class Game(arcade.View):
                     if board[i][j] == 0:
                         board[i][j] = self.bot
                         
-                        score = minimax(board, depth+1, False)
+                        score = minimax(board, depth+1, maxLevel, False)
                         
                         bestScore = max(score, bestScore)
                         bestChild = {j, i}
@@ -141,7 +134,7 @@ class Game(arcade.View):
                     
                     if board[i][j] == 0:
                         board[i][j] = self.human
-                        score = minimax(board, depth+1, True)
+                        score = minimax(board, depth+1, maxLevel, True)
                         
                         bestScore = min(score, bestScore)
                         bestChild = {j, i}
@@ -168,22 +161,22 @@ class Game(arcade.View):
         
         #below loops are counting zero boxes on all four sides of the bot
         for i in range(x+1, 10, 1):
-            if board[i][y] == 0 and ((board[i][y] != self.human or board[i][y] != self.botSplash) or board[i][y] != self.human_Splash):
+            if board[i][y] == 0:
                 rightBoxes += 1
             else:
                 break
         for i in range(x-1, -1, -1):
-            if board[i][y] == 0 and ((board[i][y] != self.human or board[i][y] != self.botSplash) or board[i][y] != self.human_Splash):
+            if board[i][y] == 0:
                 leftBoxes += 1
             else:
                 break
         for j in range(y+1, 10, 1):
-            if board[x][j] == 0 and ((board[x][j] != self.human or board[x][j] != self.botSplash) or board[x][j] != self.human_Splash):
+            if board[x][j] == 0:
                 topBoxes += 1
             else:
                 break
         for j in range(y-1, -1, -1):
-            if board[x][j] == 0 and ((board[x][j] != self.human or board[x][j] != self.botSplash) or board[x][j] != self.human_Splash):
+            if board[x][j] == 0:
                 bottomBoxes += 1
             else:
                 break
@@ -202,7 +195,6 @@ class Game(arcade.View):
         This function is updating backend 2d matrix and player scores.
         box[x,y] is the location where Snail needs to be placed. 
         """
-
         #Present Location of Bot 
         bx = self.Bot_Location[0]
         by = self.Bot_Location[1]
@@ -258,7 +250,7 @@ class Game(arcade.View):
             board[bx][by] = 2
             board[bx][by-1] = 0
 
-        if (((top == 20 or bottom == 20) or (left == 20 or bottom == 20)) or ((top == 10 or bottom == 10) or (left == 10 or right == 10))) or ((top == 1 or bottom == 1) or (left == 1 or right == 1)):
+        if right == 20:
             for i in range(bx+1, 10, 1):
                 if board[i][by] == 0 or (board[i][by] == self.human or board[i][by] == self.human_Splash):
                     if board[i][by] == 0:
@@ -270,6 +262,8 @@ class Game(arcade.View):
                         break
                     right_winingChance = 0
                     break
+
+        if left == 20:
             for i in range(bx-1, -1, -1):
                 if board[i][by] == 0 or (board[i][by] == self.human or board[i][by] == self.human_Splash):
                     if board[i][by] == 0:
@@ -281,6 +275,8 @@ class Game(arcade.View):
                         break
                     left_winingChance = 0
                     break
+        
+        if top == 20:
             for j in range(by+1, 10, 1):
                 if board[bx][j] == 0 or (board[bx][j] == self.human or board[bx][j] == self.human_Splash):
                     if board[bx][j] == 0:
@@ -292,6 +288,8 @@ class Game(arcade.View):
                         break
                     top_winingChance = 0
                     break
+        
+        if bottom == 20:
             for j in range(by-1, -1, -1):
                 if board[bx][j] == 0 or (board[bx][j] == self.human or board[bx][j] == self.human_Splash):
                     if board[bx][j] == 0:
@@ -304,29 +302,93 @@ class Game(arcade.View):
                     bottom_winingChance = 0
                     break
 
-        if left_winingChance == max(left_winingChance, right_winingChance, top_winingChance, bottom_winingChance):
+        if left_winingChance == max(left_winingChance, right_winingChance, top_winingChance, bottom_winingChance) and left == 0:
             board[bx][by] = 20
             board[bx-1][by] = 2
             self.Bot_Location[0] = bx-1
             self.Bot_Location[1] = by
 
-        elif right_winingChance == max(left_winingChance, right_winingChance, top_winingChance, bottom_winingChance):
+        elif right_winingChance == max(left_winingChance, right_winingChance, top_winingChance, bottom_winingChance) and right == 0:
             board[bx][by] = 20
             board[bx+1][by] = 2
             self.Bot_Location[0] = bx+1
             self.Bot_Location[1] = by
         
-        elif top_winingChance == max(left_winingChance, right_winingChance, top_winingChance, bottom_winingChance):
+        elif top_winingChance == max(left_winingChance, right_winingChance, top_winingChance, bottom_winingChance) and top == 0:
             board[bx][by] = 20
             board[bx][by+1] = 2
             self.Bot_Location[0] = bx
             self.Bot_Location[1] = by+1
 
-        elif bottom_winingChance == max(left_winingChance, right_winingChance, top_winingChance, bottom_winingChance):
+        elif bottom_winingChance == max(left_winingChance, right_winingChance, top_winingChance, bottom_winingChance) and bottom == 0:
             board[bx][by] = 20
             board[bx][by-1] = 2
             self.Bot_Location[0] = bx
             self.Bot_Location[1] = by-1
+
+        elif left_winingChance == max(left_winingChance, right_winingChance, top_winingChance, bottom_winingChance) and left == 20:
+            board[bx][by] = 20
+            for i in range(bx-1, -1, -1):
+                    if board[i][by] == 0 or board[i][by] == self.human or board[i][by] == self.human_Splash:
+                        board[i+1][by] = 2
+                        self.Bot_Location[0] = i+1
+                        self.Bot_Location[1] = by
+                        self.bot_score -= 1
+                        break
+                    elif i == 0:
+                        board[i][by] = 2
+                        self.Bot_Location[0] = i
+                        self.Bot_Location[1] = by
+                        self.bot_score -= 1
+                        break
+
+        elif right_winingChance == max(left_winingChance, right_winingChance, top_winingChance, bottom_winingChance) and right == 20:
+            board[bx][by] = 20
+            for i in range(bx+1, 10, 1):
+                    if board[i][by] == 0 or board[i][by] == self.human or board[i][by] == self.human_Splash:
+                        board[i-1][by] = 2
+                        self.Bot_Location[0] = i-1
+                        self.Bot_Location[1] = by
+                        self.bot_score -= 1
+                        break
+                    elif i == 9:
+                        board[i][by] = 2
+                        self.Bot_Location[0] = i
+                        self.Bot_Location[1] = by
+                        self.bot_score -= 1
+                        break
+
+        elif top_winingChance == max(left_winingChance, right_winingChance, top_winingChance, bottom_winingChance) and top == 20:
+            board[bx][by] = 20
+            for j in range(by+1, 10, 1):
+                    if board[bx][j] == 0 or board[bx][j] == self.human or board[bx][j] == self.human_Splash:
+                        board[bx][j-1] = 2
+                        self.Bot_Location[0] = bx
+                        self.Bot_Location[1] = j-1
+                        self.bot_score -= 1
+                        break
+                    elif j == 9:
+                        board[bx][j] = 2
+                        self.Bot_Location[0] = bx
+                        self.Bot_Location[1] = j
+                        self.bot_score -= 1
+                        break
+
+        elif bottom_winingChance == max(left_winingChance, right_winingChance, top_winingChance, bottom_winingChance) and bottom == 20:
+            board[bx][by] = 20
+            for j in range(by-1, -1, -1):
+                    if board[bx][j] == 0 or board[bx][j] == self.human or board[bx][j] == self.human_Splash:
+                        board[bx][j+1] = 2
+                        self.Bot_Location[0] = bx
+                        self.Bot_Location[1] = j+1
+                        self.bot_score -= 1
+                        break
+                    elif j == 0:
+                        board[bx][j] = 2
+                        self.Bot_Location[0] = bx
+                        self.Bot_Location[1] = j
+                        self.bot_score -= 1
+                        break
         
         if self.isMoveLeft(board):
             pass
@@ -352,6 +414,7 @@ class Game(arcade.View):
                     self.turn = 2000
                     self.bot_move()
                     self.update_grid(box)
+                    self.evaluateBoard_AI(board)
 
                 
             
@@ -566,10 +629,12 @@ class Game(arcade.View):
             
             
             if self.turn == 1000:
+                
                 arcade.draw_text(str("-->Turn<--"), (game_SCREEN_WIDTH/2)+400, (game_SCREEN_HEIGHT/2)-50,
                         arcade.color.DEEP_SKY_BLUE, font_size=25, anchor_x="center")
                 arcade.draw_text("Human", (game_SCREEN_WIDTH/2)+400, (game_SCREEN_HEIGHT/2)-100,
                  arcade.color.DEEP_SKY_BLUE, font_size=20, font_name='comic', anchor_x="center")
+            
             else:
                 arcade.draw_text(str("-->Turn<--"), (game_SCREEN_WIDTH/2)+400, (game_SCREEN_HEIGHT/2)-50,
                         arcade.color.DARK_RED, font_size=25, anchor_x="center")
@@ -578,31 +643,41 @@ class Game(arcade.View):
             
             #These for loops are maping background 2D Matrix with Front End Grid.
             for i in range(10):
+                
                 for j in range(10):
+                    
                     if board[i][j] == 1:
                         arcade.draw_lrwh_rectangle_textured(G_SIZE*i+5, G_SIZE*j, G_SIZE-10, G_SIZE-10, humanSnail)
+                    
                     elif board[i][j] == 2:
                         arcade.draw_lrwh_rectangle_textured(G_SIZE*i+5, G_SIZE*j, G_SIZE-10, G_SIZE-10, botSnail)
+                    
                     elif board[i][j] == 10:
                         arcade.draw_lrwh_rectangle_textured(G_SIZE*i+5, G_SIZE*j, G_SIZE-10, G_SIZE-10, humanSplash)
+                    
                     elif board[i][j] == 20:
                         arcade.draw_lrwh_rectangle_textured(G_SIZE*i+5, G_SIZE*j, G_SIZE-10, G_SIZE-10, botSplash)
         
         elif self.game_state == "Draw":
+
             arcade.set_background_color(arcade.color.BISQUE)
             arcade.draw_text("Game Over", SCREEN_WIDTH/2, SCREEN_HEIGHT/2,
                          arcade.color.BLACK, font_size=50, anchor_x="center") # These for writing text on screen
             arcade.draw_text("It's a Draw :(", SCREEN_WIDTH/2, SCREEN_HEIGHT/2-75,
                          arcade.color.GRAY, font_size=30, bold=True, anchor_x="center")
             arcade.draw_lrwh_rectangle_textured(325, 400, 200, 200, drawEmoji)
+        
         elif self.game_state == "HumanWon":
+            
             arcade.set_background_color(arcade.color.DEEP_SKY_BLUE)
             arcade.draw_text("Game Over", SCREEN_WIDTH/2, SCREEN_HEIGHT/2,
                          arcade.color.BLACK, font_size=50, anchor_x="center") # These for writing text on screen
             arcade.draw_text("Human Won", SCREEN_WIDTH/2, SCREEN_HEIGHT/2-75,
                          arcade.color.GRAY, font_size=30, anchor_x="center")
             arcade.draw_lrwh_rectangle_textured(325, 400, 200, 200, humanSnail)
+        
         elif self.game_state == "BotWon":
+            
             arcade.set_background_color(arcade.color.LIGHT_PINK)
             arcade.draw_text("Game Over", SCREEN_WIDTH/2, SCREEN_HEIGHT/2,
                          arcade.color.BLACK, font_size=50, anchor_x="center") # These for writing text on screen
