@@ -58,12 +58,12 @@ class Game(arcade.View):
         board[0][0] = 1          # marker of human in the backend matrix is 1
         board[ROWS-1][COLUMNS-1] = 2 # marker of bot in the backend matrix is 2\
         for j in range(ROWS):
-        	print()
-        	for i in range(COLUMNS):
-        		print(board[i][j], end="\t")
+            print()
+            for i in range(COLUMNS):
+                print(board[i][j], end="\t")
         print()
 
-    def evaluateBoard_AI(self, board):
+    def evaluateBoard_AI(self, board): # This function is changing states of the game
         if self.bot_score == 49 and self.human_score == 49:
             self.game_state = "Draw"
             return 0
@@ -84,6 +84,25 @@ class Game(arcade.View):
                         return None  # Continue State
             #            return 0          game_state = "GameOn" is Continue State
 
+    def evaluate(self, temp_board):  # This function is being used in recursive call
+        h_count, b_count = 0, 0
+
+        for i in range(4):
+            for j in range(4):
+                if temp_board[i][j] == 10:
+                    h_count += 1
+        
+        for i in range(4):
+            for j in range(4):
+                if temp_board[i][j] == 20:
+                    b_count += 1
+        
+        if b_count == 49 and h_count == 49:
+            return 0 # for Draw State 
+        elif b_count > 49:
+            return 10 # for Bot Win
+        elif h_count > 49:
+            return -10 # for Human Win  
     def isMoveLeft(self, board):
         for i in range(ROWS):
             for j in range(COLUMNS):
@@ -92,52 +111,237 @@ class Game(arcade.View):
                     return True
         return False
 
-    def minimax(self, board, depth, maxLevel, isAgentTurn):
-        win = 1
-        draw = 0
-        lose = -1
+    def childBoard(self, temp_board, turn):
+        temp1 = copy.deepcopy(temp_board)
+        temp2 = copy.deepcopy(temp_board)
+        temp3 = copy.deepcopy(temp_board)
+        temp4 = copy.deepcopy(temp_board)
 
-        result = self.evaluateBoard_AI(board)
-
-        if(result == win or result == draw or result == lose):
+        childBoards = []
+        if turn:
+            for i in range(4):
+                for j in range(4):
+                    if temp_board[i][j] == self.bot:
+                        x, y = j, i
+                        break
             
-            bestScore = result
-            bestChild = board
+            right, left, top, bottom = -1, -1, -1, -1
 
+            try:
+                left = temp_board[x-1][y]
+            except:
+                pass
+            try:
+                right = temp_board[x+1][y]
+            except:
+                pass
+            try:
+                top = temp_board[x][y+1]
+            except:
+                pass
+            try:
+                bottom = temp_board[x][y-1]
+            except:
+                pass
 
-        elif isAgentTurn:
+            if left == 0 and x != 0:
+                temp1[x][y] = self.botSplash
+                temp1[x-1][y] = self.bot
+                childBoards.append(temp1)
             
+            if right == 0:
+                temp2[x][y] = self.botSplash
+                temp2[x+1][y] = self.bot
+                childBoards.append(temp2)
+
+            if top == 0:
+                temp3[x][y] = self.botSplash
+                temp3[x][y+1] = self.bot
+                childBoards.append(temp3)
+            
+            if bottom == 0 and y != 0:
+                temp4[x][y] = self.botSplash
+                temp4[x][y-1] = self.bot
+                childBoards.append(temp4)
+            
+            if left == self.botSplash:
+                temp1[x][y] = self.botSplash
+                for i in range(x-1, -1, -1):
+                    if temp1[i][y] == 0 or temp1[i][y] == self.human or temp1[i][y] == self.humanSplash:
+                        temp1[i+1][y] = self.bot
+                        childBoards.append(temp1)
+                        break
+                    elif i == 0:
+                        temp1[i][y] = self.bot
+                        childBoards.append(temp1)
+                        break
+            
+            if right == self.botSplash:
+                temp2[x][y] = self.botSplash
+                for i in range(x+1, 4, 1):
+                    if temp2[i][y] == 0 or temp2[i][y] == self.human or temp2[i][y] == self.humanSplash:
+                        temp2[i-1][y] = self.bot
+                        childBoards.append(temp2)
+                        break
+                    elif i == 4:
+                        temp2[i][y] = self.bot
+                        childBoards.append(temp2)
+                        break
+            
+            if top == self.botSplash:
+                temp3[x][y] = self.botSplash
+                for j in range(y+1, 4, 1):
+                    if temp3[x][j] == 0 or temp3[x][j] == self.human or temp3[x][j] == self.humanSplash:
+                        temp3[x][j-1] = self.bot
+                        childBoards.append(temp3)
+                        break
+                    elif i == 4:
+                        temp3[x][j] = self.bot
+                        childBoards.append(temp3)
+                        break
+            
+            if bottom == self.botSplash:
+                temp4[x][y] = self.botSplash
+                for j in range(y-1, -1, -1):
+                    if temp4[x][j] == 0 or temp4[x][j] == self.human or temp4[x][j] == self.humanSplash:
+                        temp4[x][j+1] = self.bot
+                        childBoards.append(temp4)
+                        break
+                    elif i == 0:
+                        temp4[x][j] = self.bot
+                        childBoards.append(temp4)
+                        break
+                
+            return childBoards
+        
+        else:
+            for i in range(4):
+                for j in range(4):
+                    if temp_board[i][j] == self.human:
+                        x, y = j, i
+                        break
+            
+            right, left, top, bottom = -1, -1, -1, -1
+
+            try:
+                left = temp_board[x-1][y]
+            except:
+                pass
+            try:
+                right = temp_board[x+1][y]
+            except:
+                pass
+            try:
+                top = temp_board[x][y+1]
+            except:
+                pass
+            try:
+                bottom = temp_board[x][y-1]
+            except:
+                pass
+
+            if left == 0 and x != 0:
+                temp1[x][y] = self.humanSplash
+                temp1[x-1][y] = self.human
+                childBoards.append(temp1)
+            
+            if right == 0:
+                temp2[x][y] = self.humanSplash
+                temp2[x+1][y] = self.human
+                childBoards.append(temp2)
+
+            if top == 0:
+                temp3[x][y] = self.humanSplash
+                temp3[x][y+1] = self.human
+                childBoards.append(temp3)
+            
+            if bottom == 0 and y != 0:
+                temp4[x][y] = self.humanSplash
+                temp4[x][y-1] = self.human
+                childBoards.append(temp4)
+            
+            if left == self.humanSplash:
+                temp1[x][y] = self.humanSplash
+                for i in range(x-1, -1, -1):
+                    if temp1[i][y] == 0 or temp1[i][y] == self.human or temp1[i][y] == self.humanSplash:
+                        temp1[i+1][y] = self.human
+                        childBoards.append(temp1)
+                        break
+                    elif i == 0:
+                        temp1[i][y] = self.human
+                        childBoards.append(temp1)
+                        break
+            
+            if right == self.humanSplash:
+                temp2[x][y] = self.humanSplash
+                for i in range(x+1, 4, 1):
+                    if temp2[i][y] == 0 or temp2[i][y] == self.human or temp2[i][y] == self.humanSplash:
+                        temp2[i-1][y] = self.human
+                        childBoards.append(temp2)
+                        break
+                    elif i == 4:
+                        temp2[i][y] = self.human
+                        childBoards.append(temp2)
+                        break
+            
+            if top == self.humanSplash:
+                temp3[x][y] = self.humanSplash
+                for j in range(y+1, 4, 1):
+                    if temp3[x][j] == 0 or temp3[x][j] == self.human or temp3[x][j] == self.humanSplash:
+                        temp3[x][j-1] = self.human
+                        childBoards.append(temp3)
+                        break
+                    elif i == 4:
+                        temp3[x][j] = self.human
+                        childBoards.append(temp3)
+                        break
+            
+            if bottom == self.humanSplash:
+                temp4[x][y] = self.humanSplash
+                for j in range(y-1, -1, -1):
+                    if temp4[x][j] == 0 or temp4[x][j] == self.human or temp4[x][j] == self.humanSplash:
+                        temp4[x][j+1] = self.human
+                        childBoards.append(temp4)
+                        break
+                    elif i == 0:
+                        temp4[x][j] = self.human
+                        childBoards.append(temp4)
+                        break
+                
+            return childBoards
+
+    def minimax(self, temp_board, depth, maxLevel, isAgentTurn):
+        if self.evaluate(temp_board) == 10: #checking if bot won
+            return self.evaluate(temp_board) - depth
+        elif self.evaluate(temp_board) == -10: #checking if human won
+            return self.evaluate(temp_board) + depth
+        elif self.isMoveLeft(temp_board) != True: #checking game is in continue state
+            return 0
+        elif depth == 6: # recursive depth condition
+            return self.heuristic(temp_board)
+
+        if isAgentTurn:
             bestScore = -1000
-
-            if result == None:
-                score = self.heuristic(board)
-
-            for i in range(ROWS):
-                for j in range(COLUMNS):
-
-                    if board[i][j] == 0:
-                        board[i][j] = self.bot
-                        
-                        score = minimax(board, depth+1, maxLevel, False)
-                        
-                        bestScore = max(score, bestScore)
-                        bestChild = {j, i}
+            # bestheuristic = -1000
+            if self.isMoveLeft(temp_board):
+                childBoards = self.childBoard(temp_board, isAgentTurn)  #returns all child boards at current position of bot
+                
+                for i in childBoards:
+                    score = self.minimax(i, depth+1, maxLevel, False)
+                    # heu = self.heuristic(temp_board)
+                    bestScore = max(score, bestScore)
+                    # bestheuristic = max(heu, bestheuristic)
             
             return bestScore
 
         else:
-
             bestScore = 1000
-            
-            for i in range(ROWS):
-                for j in range(COLUMNS):
-                    
-                    if board[i][j] == 0:
-                        board[i][j] = self.human
-                        score = minimax(board, depth+1, maxLevel, True)
-                        
-                        bestScore = min(score, bestScore)
-                        bestChild = {j, i}
+            if self.isMoveLeft(temp_board):
+                childBoards = self.childBoard(temp_board, isAgentTurn)  #returns all child boards at current position of human
+                
+                for i in childBoards:
+                    score = self.minimax(i, depth+1, maxLevel, True)
+                    bestScore = min(score, bestScore)
             
             return bestScore
 
@@ -146,7 +350,7 @@ class Game(arcade.View):
         x, y, visitedBoxes, rightBoxes, leftBoxes, topBoxes, bottomBoxes, winningChances = 0, 0, 0, 0, 0, 0, 0, 0
         
         # Calculate the number of visited boxes by AI Agent and add them to the variable ‘winnigChances’.
-        for i in range(ROWS):
+        for i in range(ROWS):#returns all child boards at current position of bot
             for j in range(COLUMNS):
                 if board[i][j] == self.botSplash:
                     visitedBoxes += 1
@@ -191,17 +395,11 @@ class Game(arcade.View):
         return winningChances
 
     def bot_move(self):
-        """
-        This function is updating backend 2d matrix and player scores.
-        box[x,y] is the location where Snail needs to be placed. 
-        """
+
         #Present Location of Bot 
         bx = self.Bot_Location[0]
         by = self.Bot_Location[1]
-        #Present Location of Human 
-        hx = self.human_Location[0]
-        hy = self.human_Location[1]
-        #Desired Location where the mouse is clicked 
+
         left_winingChance, right_winingChance, top_winingChance, bottom_winingChance = 0, 0, 0, 0
         left, right, top, bottom = -1, -1, -1, -1
 
@@ -222,6 +420,7 @@ class Game(arcade.View):
         except:
             pass
 
+        # moving one box in all four directions and calculating heuritic values at that position
         if left == 0:
             board[bx][by] = 20
             board[bx-1][by] = 2
@@ -250,6 +449,7 @@ class Game(arcade.View):
             board[bx][by] = 2
             board[bx][by-1] = 0
 
+        # slippery conditions in all four directions and calculating heuritic values at that position
         if right == 20:
             for i in range(bx+1, 10, 1):
                 if board[i][by] == 0 or (board[i][by] == self.human or board[i][by] == self.human_Splash):
@@ -302,6 +502,7 @@ class Game(arcade.View):
                     bottom_winingChance = 0
                     break
 
+        # calculating where the heuristic is maximum
         if left_winingChance == max(left_winingChance, right_winingChance, top_winingChance, bottom_winingChance) and left == 0:
             board[bx][by] = 20
             board[bx-1][by] = 2
@@ -365,12 +566,7 @@ class Game(arcade.View):
                         board[bx][j-1] = 2
                         self.Bot_Location[0] = bx
                         self.Bot_Location[1] = j-1
-                        self.bot_score -= 1     # elif depth == 6:
-        #     for i in range(4):
-        #         for j in range(4):
-        #             if temp_board[i][j] == self.bot:
-        #                 if self.heuristic(temp_board) > 2:
-        #                     return 1
+                        self.bot_score -= 1
                         break
                     elif j == 9:
                         board[bx][j] = 2
@@ -394,12 +590,6 @@ class Game(arcade.View):
                         self.Bot_Location[1] = j
                         self.bot_score -= 1
                         break
-        
-        if self.isMoveLeft(board):
-            pass
-
-    def on_key_press(self, key, modifiers):
-        pass
             
     def on_mouse_press(self, x, y, _button, _modifiers):
         if self.game_state == "GameMenu":
@@ -583,7 +773,6 @@ class Game(arcade.View):
                 #----------------------------------------------------------------------------
                 #----------------------------------------------------------------------------
         elif self.turn == 2000:      #-----> BOT's TURN <-----
-            # board[bx][by] = 20       #Putting Splash on the Bot Location
             self.bot_score += 1      #Increasing Bot Score 
             self.turn = 1000         #Fliping turn       
 
