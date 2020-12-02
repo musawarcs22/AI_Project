@@ -421,7 +421,7 @@ class Game(arcade.View):
             pass
 
         # moving one box in all four directions and calculating heuritic values at that position
-        if left == 0 and bx != 0:
+        if left == 0 and bx > 0:
             board[bx][by] = 20
             board[bx-1][by] = 2
             left_winingChance = self.heuristic(board)
@@ -442,65 +442,66 @@ class Game(arcade.View):
             board[bx][by] = 2
             board[bx][by+1] = 0
 
-        if bottom == 0 and by != 0:
+        if bottom == 0 and by > 0:
             board[bx][by] = 20
             board[bx][by-1] = 2
             bottom_winingChance = self.heuristic(board)
             board[bx][by] = 2
             board[bx][by-1] = 0
 
+        if (left != 0 and right != 0) and (top != 0 and bottom != 0):
         # slippery conditions in all four directions and calculating heuritic values at that position
-        if right == 20:
-            for i in range(bx+1, 10, 1):
-                if board[i][by] == 0 or (board[i][by] == self.human or board[i][by] == self.human_Splash):
-                    if board[i][by] == 0:
-                        board[bx][by] = 20
-                        board[i][by] = 2
-                        right_winingChance = self.heuristic(board)
-                        board[bx][by] = 2
-                        board[i][by] = 0
+            if right == 20:
+                for i in range(bx+1, 10, 1):
+                    if board[i][by] == 0 or (board[i][by] == self.human or board[i][by] == self.human_Splash):
+                        if board[i][by] == 0:
+                            board[bx][by] = 20
+                            board[i][by] = 2
+                            right_winingChance = self.heuristic(board)
+                            board[bx][by] = 2
+                            board[i][by] = 0
+                            break
+                        right_winingChance = 0
                         break
-                    right_winingChance = 0
-                    break
 
-        if left == 20:
-            for i in range(bx-1, -1, -1):
-                if board[i][by] == 0 or (board[i][by] == self.human or board[i][by] == self.human_Splash):
-                    if board[i][by] == 0:
-                        board[bx][by] = 20
-                        board[i][by] = 2
-                        left_winingChance = self.heuristic(board)
-                        board[bx][by] = 2
-                        board[i][by] = 0
+            if left == 20:
+                for i in range(bx-1, -1, -1):
+                    if board[i][by] == 0 or (board[i][by] == self.human or board[i][by] == self.human_Splash):
+                        if board[i][by] == 0:
+                            board[bx][by] = 20
+                            board[i][by] = 2
+                            left_winingChance = self.heuristic(board)
+                            board[bx][by] = 2
+                            board[i][by] = 0
+                            break
+                        left_winingChance = 0
                         break
-                    left_winingChance = 0
-                    break
-        
-        if top == 20:
-            for j in range(by+1, 10, 1):
-                if board[bx][j] == 0 or (board[bx][j] == self.human or board[bx][j] == self.human_Splash):
-                    if board[bx][j] == 0:
-                        board[bx][by] = 20
-                        board[bx][j] = 2
-                        top_winingChance = self.heuristic(board)
-                        board[bx][by] = 2
-                        board[bx][j] = 0
+            
+            if top == 20:
+                for j in range(by+1, 10, 1):
+                    if board[bx][j] == 0 or (board[bx][j] == self.human or board[bx][j] == self.human_Splash):
+                        if board[bx][j] == 0:
+                            board[bx][by] = 20
+                            board[bx][j] = 2
+                            top_winingChance = self.heuristic(board)
+                            board[bx][by] = 2
+                            board[bx][j] = 0
+                            break
+                        top_winingChance = 0
                         break
-                    top_winingChance = 0
-                    break
-        
-        if bottom == 20:
-            for j in range(by-1, -1, -1):
-                if board[bx][j] == 0 or (board[bx][j] == self.human or board[bx][j] == self.human_Splash):
-                    if board[bx][j] == 0:
-                        board[bx][by] = 20
-                        board[bx][j] = 2
-                        bottom_winingChance = self.heuristic(board)
-                        board[bx][by] = 2
-                        board[bx][j] = 0
+            
+            if bottom == 20:
+                for j in range(by-1, -1, -1):
+                    if board[bx][j] == 0 or (board[bx][j] == self.human or board[bx][j] == self.human_Splash):
+                        if board[bx][j] == 0:
+                            board[bx][by] = 20
+                            board[bx][j] = 2
+                            bottom_winingChance = self.heuristic(board)
+                            board[bx][by] = 2
+                            board[bx][j] = 0
+                            break
+                        bottom_winingChance = 0
                         break
-                    bottom_winingChance = 0
-                    break
 
         # calculating where the heuristic is maximum
         if left_winingChance == max(left_winingChance, right_winingChance, top_winingChance, bottom_winingChance) and left == 0:
