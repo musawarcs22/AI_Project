@@ -167,7 +167,7 @@ class Game(arcade.View):
             if left == self.botSplash:
                 temp1[x][y] = self.botSplash
                 for i in range(x-1, -1, -1):
-                    if temp1[i][y] == 0 or temp1[i][y] == self.human or temp1[i][y] == self.humanSplash:
+                    if temp1[i][y] == 0 or temp1[i][y] == self.human or temp1[i][y] == self.human_Splash:
                         temp1[i+1][y] = self.bot
                         childBoards.append(temp1)
                         break
@@ -179,7 +179,7 @@ class Game(arcade.View):
             if right == self.botSplash:
                 temp2[x][y] = self.botSplash
                 for i in range(x+1, 4, 1):
-                    if temp2[i][y] == 0 or temp2[i][y] == self.human or temp2[i][y] == self.humanSplash:
+                    if temp2[i][y] == 0 or temp2[i][y] == self.human or temp2[i][y] == self.human_Splash:
                         temp2[i-1][y] = self.bot
                         childBoards.append(temp2)
                         break
@@ -191,7 +191,7 @@ class Game(arcade.View):
             if top == self.botSplash:
                 temp3[x][y] = self.botSplash
                 for j in range(y+1, 4, 1):
-                    if temp3[x][j] == 0 or temp3[x][j] == self.human or temp3[x][j] == self.humanSplash:
+                    if temp3[x][j] == 0 or temp3[x][j] == self.human or temp3[x][j] == self.human_Splash:
                         temp3[x][j-1] = self.bot
                         childBoards.append(temp3)
                         break
@@ -203,7 +203,7 @@ class Game(arcade.View):
             if bottom == self.botSplash:
                 temp4[x][y] = self.botSplash
                 for j in range(y-1, -1, -1):
-                    if temp4[x][j] == 0 or temp4[x][j] == self.human or temp4[x][j] == self.humanSplash:
+                    if temp4[x][j] == 0 or temp4[x][j] == self.human or temp4[x][j] == self.human_Splash:
                         temp4[x][j+1] = self.bot
                         childBoards.append(temp4)
                         break
@@ -241,29 +241,29 @@ class Game(arcade.View):
                 pass
 
             if left == 0 and x != 0:
-                temp1[x][y] = self.humanSplash
+                temp1[x][y] = self.human_Splash
                 temp1[x-1][y] = self.human
                 childBoards.append(temp1)
             
             if right == 0:
-                temp2[x][y] = self.humanSplash
+                temp2[x][y] = self.human_Splash
                 temp2[x+1][y] = self.human
                 childBoards.append(temp2)
 
             if top == 0:
-                temp3[x][y] = self.humanSplash
+                temp3[x][y] = self.human_Splash
                 temp3[x][y+1] = self.human
                 childBoards.append(temp3)
             
             if bottom == 0 and y != 0:
-                temp4[x][y] = self.humanSplash
+                temp4[x][y] = self.human_Splash
                 temp4[x][y-1] = self.human
                 childBoards.append(temp4)
             
-            if left == self.humanSplash:
-                temp1[x][y] = self.humanSplash
+            if left == self.human_Splash:
+                temp1[x][y] = self.human_Splash
                 for i in range(x-1, -1, -1):
-                    if temp1[i][y] == 0 or temp1[i][y] == self.human or temp1[i][y] == self.humanSplash:
+                    if temp1[i][y] == 0 or temp1[i][y] == self.bot or temp1[i][y] == self.botSplash:
                         temp1[i+1][y] = self.human
                         childBoards.append(temp1)
                         break
@@ -272,10 +272,10 @@ class Game(arcade.View):
                         childBoards.append(temp1)
                         break
             
-            if right == self.humanSplash:
-                temp2[x][y] = self.humanSplash
+            if right == self.human_Splash:
+                temp2[x][y] = self.human_Splash
                 for i in range(x+1, 4, 1):
-                    if temp2[i][y] == 0 or temp2[i][y] == self.human or temp2[i][y] == self.humanSplash:
+                    if temp2[i][y] == 0 or temp2[i][y] == self.bot or temp2[i][y] == self.botSplash:
                         temp2[i-1][y] = self.human
                         childBoards.append(temp2)
                         break
@@ -284,10 +284,10 @@ class Game(arcade.View):
                         childBoards.append(temp2)
                         break
             
-            if top == self.humanSplash:
-                temp3[x][y] = self.humanSplash
+            if top == self.human_Splash:
+                temp3[x][y] = self.human_Splash
                 for j in range(y+1, 4, 1):
-                    if temp3[x][j] == 0 or temp3[x][j] == self.human or temp3[x][j] == self.humanSplash:
+                    if temp3[x][j] == 0 or temp3[x][j] == self.bot or temp3[x][j] == self.botSplash:
                         temp3[x][j-1] = self.human
                         childBoards.append(temp3)
                         break
@@ -296,10 +296,10 @@ class Game(arcade.View):
                         childBoards.append(temp3)
                         break
             
-            if bottom == self.humanSplash:
-                temp4[x][y] = self.humanSplash
+            if bottom == self.human_Splash:
+                temp4[x][y] = self.human_Splash
                 for j in range(y-1, -1, -1):
-                    if temp4[x][j] == 0 or temp4[x][j] == self.human or temp4[x][j] == self.humanSplash:
+                    if temp4[x][j] == 0 or temp4[x][j] == self.bot or temp4[x][j] == self.botSplash:
                         temp4[x][j+1] = self.human
                         childBoards.append(temp4)
                         break
@@ -421,7 +421,7 @@ class Game(arcade.View):
             pass
 
         # moving one box in all four directions and calculating heuritic values at that position
-        if left == 0:
+        if left == 0 and bx != 0:
             board[bx][by] = 20
             board[bx-1][by] = 2
             left_winingChance = self.heuristic(board)
@@ -442,7 +442,7 @@ class Game(arcade.View):
             board[bx][by] = 2
             board[bx][by+1] = 0
 
-        if bottom == 0:
+        if bottom == 0 and by != 0:
             board[bx][by] = 20
             board[bx][by-1] = 2
             bottom_winingChance = self.heuristic(board)
