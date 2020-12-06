@@ -20,7 +20,7 @@ SCREEN_HEIGHT = 600
 game_SCREEN_WIDTH = 600
 game_SCREEN_HEIGHT = 600
 
-SCREEN_TITLE = "--->SNAILS<---"
+SCREEN_TITLE = "---> WORLD OF SNAILS <---"
 
 board = [] # 2D List for backEnd Matrix
 
@@ -667,7 +667,20 @@ class Game(arcade.View):
                         self.Bot_Location[1] = j
                         self.bot_score -= 1
                         break
+
+    def on_key_press(self, key, modifiers):
             
+        if key == arcade.key.ENTER:
+            for i in range(10):
+                for j in range(10):
+                    board[i][j] = 0
+            self.__init__()
+        
+        elif key == arcade.key.BACKSPACE:
+            exit()
+        else:
+            return
+
     def on_mouse_press(self, x, y, _button, _modifiers):
         if self.game_state == "GameMenu":
                 self.game_state = "GameOn"
@@ -929,31 +942,27 @@ class Game(arcade.View):
                     elif board[i][j] == 20:
                         arcade.draw_lrwh_rectangle_textured(G_SIZE*i+5, G_SIZE*j, G_SIZE-10, G_SIZE-10, botSplash)
         
+        
         elif self.game_state == "Draw":
-
             arcade.set_background_color(arcade.color.BISQUE)
-            arcade.draw_text("Game Over", SCREEN_WIDTH/2, SCREEN_HEIGHT/2,
+            arcade.draw_text("It's a Draw :(", SCREEN_WIDTH/2, SCREEN_HEIGHT/2,
                          arcade.color.BLACK, font_size=50, anchor_x="center") # These for writing text on screen
-            arcade.draw_text("It's a Draw :(", SCREEN_WIDTH/2, SCREEN_HEIGHT/2-75,
-                         arcade.color.GRAY, font_size=30, bold=True, anchor_x="center")
+            arcade.draw_text("--> Press Enter to Play again or Backspace to Quit <--", SCREEN_WIDTH/2, SCREEN_HEIGHT/2-75,
+                         arcade.color.GRAY, font_size=17, anchor_x="center")
             arcade.draw_lrwh_rectangle_textured(325, 400, 200, 200, drawEmoji)
-        
         elif self.game_state == "HumanWon":
-            
             arcade.set_background_color(arcade.color.DEEP_SKY_BLUE)
-            arcade.draw_text("Game Over", SCREEN_WIDTH/2, SCREEN_HEIGHT/2,
+            arcade.draw_text("Human Won", SCREEN_WIDTH/2, SCREEN_HEIGHT/2,
                          arcade.color.BLACK, font_size=50, anchor_x="center") # These for writing text on screen
-            arcade.draw_text("Human Won", SCREEN_WIDTH/2, SCREEN_HEIGHT/2-75,
-                         arcade.color.GRAY, font_size=30, anchor_x="center")
+            arcade.draw_text("--> Press Enter to Play again or Backspace to Quit <--", SCREEN_WIDTH/2, SCREEN_HEIGHT/2-75,
+                         arcade.color.GRAY, font_size=17, anchor_x="center")
             arcade.draw_lrwh_rectangle_textured(325, 400, 200, 200, humanSnail)
-        
         elif self.game_state == "BotWon":
-            
             arcade.set_background_color(arcade.color.LIGHT_PINK)
-            arcade.draw_text("Game Over", SCREEN_WIDTH/2, SCREEN_HEIGHT/2,
+            arcade.draw_text("Bot Won", SCREEN_WIDTH/2, SCREEN_HEIGHT/2,
                          arcade.color.BLACK, font_size=50, anchor_x="center") # These for writing text on screen
-            arcade.draw_text("Bot Won", SCREEN_WIDTH/2, SCREEN_HEIGHT/2-75,
-                         arcade.color.GRAY, font_size=30, anchor_x="center")
+            arcade.draw_text("--> Press Enter to Play again or Backspace to Quit <--", SCREEN_WIDTH/2, SCREEN_HEIGHT/2-75,
+                         arcade.color.GRAY, font_size=17, anchor_x="center")
             arcade.draw_lrwh_rectangle_textured(325, 400, 200, 200, botSnail)             
 
 def main():
