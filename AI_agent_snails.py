@@ -103,13 +103,13 @@ class Game(arcade.View):
     def evaluate(self, temp_board):  # This function is being used in recursive call of minimax ()
         h_count, b_count = 0, 0
 
-        for i in range(4):
-            for j in range(4):
+        for i in range(10):
+            for j in range(10):
                 if temp_board[i][j] == 10:
                     h_count += 1
         
-        for i in range(4):
-            for j in range(4):
+        for i in range(10):
+            for j in range(10):
                 if temp_board[i][j] == 20:
                     b_count += 1
         
@@ -140,8 +140,8 @@ class Game(arcade.View):
 
         childBoards = [] # This of child boards will be returned. 
         if turn:         # If turn == true, it means this is Bot's turn        
-            for i in range(4):
-                for j in range(4):
+            for i in range(10):
+                for j in range(10):
                     if temp_board[i][j] == self.bot:
                         x, y = j, i
                         break
@@ -205,24 +205,24 @@ class Game(arcade.View):
             
             if right == self.botSplash:
                 temp2[x][y] = self.botSplash
-                for i in range(x+1, 4, 1):
+                for i in range(x+1, 10, 1):
                     if temp2[i][y] == 0 or temp2[i][y] == self.human or temp2[i][y] == self.human_Splash:
                         temp2[i-1][y] = self.bot
                         childBoards.append(temp2)
                         break
-                    elif i == 4:
+                    elif i == 10:
                         temp2[i][y] = self.bot
                         childBoards.append(temp2)
                         break
             
             if top == self.botSplash:
                 temp3[x][y] = self.botSplash
-                for j in range(y+1, 4, 1):
+                for j in range(y+1, 10, 1):
                     if temp3[x][j] == 0 or temp3[x][j] == self.human or temp3[x][j] == self.human_Splash:
                         temp3[x][j-1] = self.bot
                         childBoards.append(temp3)
                         break
-                    elif i == 4:
+                    elif i == 10:
                         temp3[x][j] = self.bot
                         childBoards.append(temp3)
                         break
@@ -242,8 +242,8 @@ class Game(arcade.View):
             return childBoards
         
         else:# This else will execute If turn == False, means this is "Human's turn". 
-            for i in range(4):
-                for j in range(4):
+            for i in range(10):
+                for j in range(10):
                     if temp_board[i][j] == self.human:
                         x, y = j, i
                         break
@@ -307,24 +307,24 @@ class Game(arcade.View):
             
             if right == self.human_Splash:
                 temp2[x][y] = self.human_Splash
-                for i in range(x+1, 4, 1):
+                for i in range(x+1, 10, 1):
                     if temp2[i][y] == 0 or temp2[i][y] == self.bot or temp2[i][y] == self.botSplash:
                         temp2[i-1][y] = self.human
                         childBoards.append(temp2)
                         break
-                    elif i == 4:
+                    elif i == 10:
                         temp2[i][y] = self.human
                         childBoards.append(temp2)
                         break
             
             if top == self.human_Splash:
                 temp3[x][y] = self.human_Splash
-                for j in range(y+1, 4, 1):
+                for j in range(y+1, 10, 1):
                     if temp3[x][j] == 0 or temp3[x][j] == self.bot or temp3[x][j] == self.botSplash:
                         temp3[x][j-1] = self.human
                         childBoards.append(temp3)
                         break
-                    elif i == 4:
+                    elif i == 10:
                         temp3[x][j] = self.human
                         childBoards.append(temp3)
                         break
@@ -343,7 +343,7 @@ class Game(arcade.View):
                 
             return childBoards
 
-    def minimax(self, temp_board, depth, maxLevel, isAgentTurn):
+    def minimax(self, temp_board, depth, isAgentTurn):
         """
         Our logic to make AI agent (Bot) intelligent through
         "minimax Algorithm" is that when the terminating depth
@@ -352,7 +352,6 @@ class Game(arcade.View):
         means child boards and finds where the heuristic returns
         the maximum value and goes in that direction.
         """
-
         if self.evaluate(temp_board) == 10: #checking if bot won
             return self.evaluate(temp_board) - depth
         elif self.evaluate(temp_board) == -10: #checking if human won
@@ -369,7 +368,7 @@ class Game(arcade.View):
                 childBoards = self.childBoard(temp_board, isAgentTurn)  #returns all child boards at current position of bot
                 
                 for i in childBoards:
-                    score = self.minimax(i, depth+1, maxLevel, False)
+                    score = self.minimax(i, depth+1, False)
                     # heu = self.heuristic(temp_board)
                     bestScore = max(score, bestScore)
                     # bestheuristic = max(heu, bestheuristic)
@@ -382,7 +381,7 @@ class Game(arcade.View):
                 childBoards = self.childBoard(temp_board, isAgentTurn)  #returns all child boards at current position of human
                 
                 for i in childBoards:
-                    score = self.minimax(i, depth+1, maxLevel, True)
+                    score = self.minimax(i, depth+1, True)
                     bestScore = min(score, bestScore)
             
             return bestScore
