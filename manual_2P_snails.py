@@ -77,8 +77,20 @@ class Game(arcade.View):
                 for j in range(10):
                     if board[i][j] == 0:
                         self.state = 0  # Continue State
-            #            return 0          game_state = "GameOn" is Continue State
-
+                        return 
+            
+            #The following conditions are necessary to tell
+            #the outcome of the game if the board is completely filled.
+            
+            if self.bot_score > self.human_score:
+                self.game_state = "BotWon"
+                return 1
+            elif self.bot_score < self.human_score:
+                self.game_state = "HumanWon"
+                return -1
+            else:
+                self.game_state = "Draw"
+                return 0
     def on_key_press(self, key, modifiers):
         pass
             

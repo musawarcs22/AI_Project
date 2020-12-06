@@ -1,5 +1,6 @@
 import arcade
 import random
+import copy
 
 # Loading needed images
 background = arcade.load_texture("Images/BC.jpg") # background image
@@ -63,7 +64,7 @@ class Game(arcade.View):
                 print(board[i][j], end="\t")
         print()
 
-    def evaluateBoard_AI(self, board): # This function is changing states of the game
+    def evaluateBoard_AI(self, board): # This function is changing states of the game.
         if self.bot_score == 49 and self.human_score == 49:
             self.game_state = "Draw"
             return 0
@@ -83,8 +84,23 @@ class Game(arcade.View):
                         self.state = 0
                         return None  # Continue State
             #            return 0          game_state = "GameOn" is Continue State
+            
+            #The following conditions are necessary to tell
+            # the outcome of the game if the board is completely filled.
 
-    def evaluate(self, temp_board):  # This function is being used in recursive call
+            if self.bot_score > self.human_score:
+                self.game_state = "BotWon"
+                return 1
+            elif self.bot_score < self.human_score:
+                self.game_state = "HumanWon"
+                return -1
+            else:
+                self.game_state = "Draw"
+                return 0 
+        
+                        
+
+    def evaluate(self, temp_board):  # This function is being used in recursive call of minimax ()
         h_count, b_count = 0, 0
 
         for i in range(4):
@@ -112,13 +128,18 @@ class Game(arcade.View):
         return False
 
     def childBoard(self, temp_board, turn):
+        """
+        This is a helper function which is called by minimax()
+        and it returns the list of child boards according to
+        the current location of Agent either it is Bot or Human.
+        """
         temp1 = copy.deepcopy(temp_board)
         temp2 = copy.deepcopy(temp_board)
         temp3 = copy.deepcopy(temp_board)
         temp4 = copy.deepcopy(temp_board)
 
-        childBoards = []
-        if turn:
+        childBoards = [] # This of child boards will be returned. 
+        if turn:         # If turn == true, it means this is Bot's turn        
             for i in range(4):
                 for j in range(4):
                     if temp_board[i][j] == self.bot:
@@ -144,17 +165,20 @@ class Game(arcade.View):
             except:
                 pass
 
-            if left == 0 and x != 0:
+            # The following four if conditions are for the case
+            # when there is a zero present on a possible move. 
+            
+            if left == 0 and x != 0: # if x==0 then it is the zeroth column and there is no left box.
                 temp1[x][y] = self.botSplash
                 temp1[x-1][y] = self.bot
                 childBoards.append(temp1)
             
-            if right == 0:
+            if right == 0 and x != 9:
                 temp2[x][y] = self.botSplash
                 temp2[x+1][y] = self.bot
                 childBoards.append(temp2)
 
-            if top == 0:
+            if top == 0 and y != 9:
                 temp3[x][y] = self.botSplash
                 temp3[x][y+1] = self.bot
                 childBoards.append(temp3)
@@ -163,7 +187,10 @@ class Game(arcade.View):
                 temp4[x][y] = self.botSplash
                 temp4[x][y-1] = self.bot
                 childBoards.append(temp4)
-            
+
+            # The following four if conditions are for the case
+            #  when there is bot splash present on a possible move.
+             
             if left == self.botSplash:
                 temp1[x][y] = self.botSplash
                 for i in range(x-1, -1, -1):
@@ -214,7 +241,7 @@ class Game(arcade.View):
                 
             return childBoards
         
-        else:
+        else:# This else will execute If turn == False, means this is "Human's turn". 
             for i in range(4):
                 for j in range(4):
                     if temp_board[i][j] == self.human:
@@ -240,17 +267,20 @@ class Game(arcade.View):
             except:
                 pass
 
+            # The following four if conditions are for the case
+            # when there is a zero present on a possible move by Human. 
+            
             if left == 0 and x != 0:
                 temp1[x][y] = self.human_Splash
                 temp1[x-1][y] = self.human
                 childBoards.append(temp1)
             
-            if right == 0:
+            if right == 0 and x != 9:
                 temp2[x][y] = self.human_Splash
                 temp2[x+1][y] = self.human
                 childBoards.append(temp2)
 
-            if top == 0:
+            if top == 0 and y != 9:
                 temp3[x][y] = self.human_Splash
                 temp3[x][y+1] = self.human
                 childBoards.append(temp3)
@@ -259,6 +289,9 @@ class Game(arcade.View):
                 temp4[x][y] = self.human_Splash
                 temp4[x][y-1] = self.human
                 childBoards.append(temp4)
+
+            # The following four if conditions are for the case
+            #  when there is "Human Splash" present on a possible move.            
             
             if left == self.human_Splash:
                 temp1[x][y] = self.human_Splash
@@ -311,6 +344,15 @@ class Game(arcade.View):
             return childBoards
 
     def minimax(self, temp_board, depth, maxLevel, isAgentTurn):
+        """
+        Our logic to make AI agent (Bot) intelligent through
+        "minimax Algorithm" is that when the terminating depth
+        is reached in the recursive calls of minimax() then we
+        have to call “heuristic()” function on every leaf nodes
+        means child boards and finds where the heuristic returns
+        the maximum value and goes in that direction.
+        """
+
         if self.evaluate(temp_board) == 10: #checking if bot won
             return self.evaluate(temp_board) - depth
         elif self.evaluate(temp_board) == -10: #checking if human won
@@ -346,11 +388,25 @@ class Game(arcade.View):
             return bestScore
 
     def heuristic(self, board):
+
+        """
+        Our heuristic function takes a board as input and returns
+        winning chances at the current location of the Bot. We are
+        calculating winning chances by applying three conditions:
+        
+        1) checking visited boxes by the bot and adding their count to
+        winning chances.
+        2) checking unvisited boxes in all four directions around the
+        bot and the max of them will be added to winning chances.
+        3) checking Bot’s position whether it is in the central
+        area of the board or not. If it is, then winning chances
+        are incremented by a value of 10. 
+        """
         
         x, y, visitedBoxes, rightBoxes, leftBoxes, topBoxes, bottomBoxes, winningChances = 0, 0, 0, 0, 0, 0, 0, 0
         
         # Calculate the number of visited boxes by AI Agent and add them to the variable ‘winnigChances’.
-        for i in range(ROWS):#returns all child boards at current position of bot
+        for i in range(ROWS):
             for j in range(COLUMNS):
                 if board[i][j] == self.botSplash:
                     visitedBoxes += 1
@@ -396,6 +452,15 @@ class Game(arcade.View):
 
     def bot_move(self):
 
+        """
+        The Bot plays his moves using this function in such
+        a way that it manually moves the Bot in all four
+        directions and checks where the winning chances are
+        maximum using the heuristic function. Where it gets
+        the maximum winning chances, it moves the Bot in
+        that direction.
+        """
+
         #Present Location of Bot 
         bx = self.Bot_Location[0]
         by = self.Bot_Location[1]
@@ -420,7 +485,9 @@ class Game(arcade.View):
         except:
             pass
 
-        # moving one box in all four directions and calculating heuritic values at that position
+        # moving one box in all four directions and
+        # calculating heuritic values at those positions.
+        
         if left == 0 and bx > 0:
             board[bx][by] = 20
             board[bx-1][by] = 2
@@ -428,14 +495,14 @@ class Game(arcade.View):
             board[bx][by] = 2
             board[bx-1][by] = 0
 
-        if right == 0:
+        if right == 0 and bx < 9:#updated
             board[bx][by] = 20
             board[bx+1][by] = 2
             right_winingChance = self.heuristic(board)
             board[bx][by] = 2
             board[bx+1][by] = 0
 
-        if top == 0:
+        if top == 0 and by < 9: #updated
             board[bx][by] = 20
             board[bx][by+1] = 2
             top_winingChance = self.heuristic(board)
@@ -449,9 +516,9 @@ class Game(arcade.View):
             board[bx][by] = 2
             board[bx][by-1] = 0
 
-        if (left != 0 and right != 0) and (top != 0 and bottom != 0):
+        if left != 0 and right != 0 and top != 0 and bottom != 0:
         # slippery conditions in all four directions and calculating heuritic values at that position
-            if right == 20:
+            if right == 20 and bx < 9:
                 for i in range(bx+1, 10, 1):
                     if board[i][by] == 0 or (board[i][by] == self.human or board[i][by] == self.human_Splash):
                         if board[i][by] == 0:
@@ -502,6 +569,16 @@ class Game(arcade.View):
                             break
                         bottom_winingChance = 0
                         break
+            
+            # The following 4 ifs are not working well :)
+            if right == 10 or right == 1:
+                right_winingChance = 0
+            if left == 10 or left == 1:
+                left_winingChance = 0
+            if bottom == 10 or bottom == 1:
+                bottom_winingChance = 0
+            if top == 10 or top == 1:
+                top_winingChance = 0
 
         # calculating where the heuristic is maximum
         if left_winingChance == max(left_winingChance, right_winingChance, top_winingChance, bottom_winingChance) and left == 0:
