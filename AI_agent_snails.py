@@ -358,20 +358,23 @@ class Game(arcade.View):
             return self.evaluate(temp_board) + depth
         elif self.isMoveLeft(temp_board) != True: #checking game is in continue state
             return 0
-        elif depth == 6: # recursive depth condition
-            return self.heuristic(temp_board)
+        # elif depth == 10: # recursive depth condition
+        #     return bestheuristic
 
         if isAgentTurn:
             bestScore = -1000
-            # bestheuristic = -1000
+            bestheuristic = -1000
             if self.isMoveLeft(temp_board):
                 childBoards = self.childBoard(temp_board, isAgentTurn)  #returns all child boards at current position of bot
                 
                 for i in childBoards:
                     score = self.minimax(i, depth+1, False)
-                    # heu = self.heuristic(temp_board)
+                    heu = self.heuristic(temp_board)
                     bestScore = max(score, bestScore)
-                    # bestheuristic = max(heu, bestheuristic)
+                    bestheuristic = max(heu, bestheuristic)
+
+                if depth == 10:
+                    return bestheuristic
             
             return bestScore
 
@@ -568,6 +571,15 @@ class Game(arcade.View):
                             break
                         bottom_winingChance = 0
                         break
+
+            if top == 10 or top == 1:
+                left_winingChance = -1
+            if bottom == 10 or bottom == 1:
+                bottom_winingChance = -1
+            if right == 10 or right == 1:
+                right_winingChance = -1
+            if left == 10 or left == 1:
+                left_winingChance = -1
             
             # The following 4 ifs are not working well :)
             if right == 10 or right == 1:
